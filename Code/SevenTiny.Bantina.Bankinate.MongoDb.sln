@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SevenTiny.Bantina.Bankinate.MongoDb", "..\10-Code\SevenTiny.Bantina.Bankinate.MongoDb\SevenTiny.Bantina.Bankinate.MongoDb.csproj", "{A9B33D60-3FA2-4896-8AD6-729E8A9686CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SevenTiny.Bantina.Bankinate.MongoDb", "..\Code\SevenTiny.Bantina.Bankinate.MongoDb\SevenTiny.Bantina.Bankinate.MongoDb.csproj", "{A9B33D60-3FA2-4896-8AD6-729E8A9686CE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SevenTiny.Bantina.Bankinate.Core", "..\10-Code\SevenTiny.Bantina.Bankinate.Core\SevenTiny.Bantina.Bankinate.Core.csproj", "{B12E224E-FD82-458F-AB62-00A800F1B0B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SevenTiny.Bantina.Bankinate.Core", "..\Code\SevenTiny.Bantina.Bankinate.Core\SevenTiny.Bantina.Bankinate.Core.csproj", "{B12E224E-FD82-458F-AB62-00A800F1B0B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
