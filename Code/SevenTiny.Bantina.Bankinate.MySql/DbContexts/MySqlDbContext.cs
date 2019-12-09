@@ -3,6 +3,7 @@ using SevenTiny.Bantina.Bankinate.Attributes;
 using SevenTiny.Bantina.Bankinate.DbContexts;
 using SevenTiny.Bantina.Bankinate.Extensions;
 using SevenTiny.Bantina.Bankinate.MySql.SqlStatementManagement;
+using SevenTiny.Bantina.Bankinate.SqlStatementManagement;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -18,21 +19,11 @@ namespace SevenTiny.Bantina.Bankinate
             DataBaseName = DataBaseAttribute.GetName(typeof(TDataBase));
         }
 
-        internal override void CreateDbConnection(string connectionString)
-        {
-            DbConnection = new MySqlConnection(connectionString);
-        }
-        internal override void CreateDbCommand()
-        {
-            DbCommand = new MySqlCommand();
-            DbCommand.Connection = this.DbConnection;
-        }
-        internal override void CreateDbDataAdapter()
-        {
-            DbDataAdapter = new MySqlDataAdapter();
-            DbDataAdapter.SelectCommand = this.DbCommand;
-        }
-        internal override void CreateCommandTextGenerator() => CommandTextGenerator = new MySqlCommandTextGenerator(this);
+        internal override DbConnection CreateDbConnection(string connectionString) => new MySqlConnection(connectionString);
+        internal override DbCommand CreateDbCommand() => new MySqlCommand(string.Empty, (MySqlConnection)this.DbConnection);
+        internal override DbDataAdapter CreateDbDataAdapter() => new MySqlDataAdapter((MySqlCommand)this.DbCommand);
+        internal override CommandTextGeneratorBase CreateCommandTextGenerator() => new MySqlCommandTextGenerator(this);
+
         /// <summary>
         /// 命令参数初始化
         /// </summary>

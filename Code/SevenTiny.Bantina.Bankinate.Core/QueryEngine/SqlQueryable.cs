@@ -25,15 +25,15 @@ namespace SevenTiny.Bantina.Bankinate
     /// SQL强类型复杂查询器
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class SqlQueryable<TEntity> : SqlQueryableBase<TEntity>, ILinqQueryable<TEntity> where TEntity : class
+    internal class SqlQueryable<TEntity> : SqlQueryableBase<TEntity>, ILinqQueryable<TEntity> where TEntity : class
     {
         private string Alias => _where.Parameters[0].Name;
 
-        public SqlQueryable(SqlDbContext _dbContext) : base(_dbContext)
+        internal SqlQueryable(SqlDbContext _dbContext) : base(_dbContext)
         {
         }
 
-        public IQueryable<TEntity> Where(Expression<Func<TEntity, bool>> filter)
+        public ILinqQueryable<TEntity> Where(Expression<Func<TEntity, bool>> filter)
         {
             if (_where != null)
                 _where = _where.And(filter);
@@ -42,21 +42,21 @@ namespace SevenTiny.Bantina.Bankinate
             return this;
         }
 
-        public IQueryable<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy)
+        public ILinqQueryable<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy)
         {
             _orderby = orderBy;
             _isDesc = false;
             return this;
         }
 
-        public IQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy)
+        public ILinqQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy)
         {
             _orderby = orderBy;
             _isDesc = true;
             return this;
         }
 
-        public IQueryable<TEntity> Paging(int pageIndex, int pageSize)
+        public ILinqQueryable<TEntity> Paging(int pageIndex, int pageSize)
         {
             _isPaging = true;
 
@@ -76,7 +76,7 @@ namespace SevenTiny.Bantina.Bankinate
         /// </summary>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public IQueryable<TEntity> Select(Expression<Func<TEntity, object>> columns)
+        public ILinqQueryable<TEntity> Select(Expression<Func<TEntity, object>> columns)
         {
             _columns = columns;
             return this;
@@ -87,7 +87,7 @@ namespace SevenTiny.Bantina.Bankinate
         /// </summary>
         /// <param name="count"></param>
         /// <returns></returns>
-        public IQueryable<TEntity> Limit(int count)
+        public ILinqQueryable<TEntity> Limit(int count)
         {
             DbContext.CommandTextGenerator.SetLimit(count);
             return this;

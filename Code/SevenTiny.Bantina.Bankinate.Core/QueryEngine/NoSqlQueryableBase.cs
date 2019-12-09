@@ -23,9 +23,9 @@ namespace SevenTiny.Bantina.Bankinate
     /// NoSqlQueryable的相关配置信息
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public abstract class NoSqlQueryableBase<TEntity> where TEntity : class
+    internal abstract class NoSqlQueryableBase<TEntity> where TEntity : class
     {
-        public NoSqlQueryableBase(NoSqlDbContext _dbContext)
+        internal NoSqlQueryableBase(NoSqlDbContext _dbContext)
         {
             this.DbContext = _dbContext;
         }

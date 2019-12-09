@@ -24,11 +24,11 @@ namespace SevenTiny.Bantina.Bankinate
         /// <returns></returns>
         bool Any();
 
-        IQueryable<TEntity> Where(Expression<Func<TEntity, bool>> filter);
-        IQueryable<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy);
-        IQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy);
-        IQueryable<TEntity> Paging(int pageIndex, int pageSize);
-        IQueryable<TEntity> Select(Expression<Func<TEntity, object>> columns);
-        IQueryable<TEntity> Limit(int count);
+        ILinqQueryable<TEntity> Where(Expression<Func<TEntity, bool>> filter);
+        ILinqQueryable<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy);
+        ILinqQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy);
+        ILinqQueryable<TEntity> Paging(int pageIndex, int pageSize);
+        ILinqQueryable<TEntity> Select(Expression<Func<TEntity, object>> columns);
+        ILinqQueryable<TEntity> Limit(int count);
     }
 }

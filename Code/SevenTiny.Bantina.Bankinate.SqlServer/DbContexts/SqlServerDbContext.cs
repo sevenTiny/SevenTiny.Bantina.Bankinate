@@ -2,8 +2,10 @@
 using SevenTiny.Bantina.Bankinate.DbContexts;
 using SevenTiny.Bantina.Bankinate.Extensions;
 using SevenTiny.Bantina.Bankinate.SqlServer.SqlStatementManagement;
+using SevenTiny.Bantina.Bankinate.SqlStatementManagement;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -17,21 +19,11 @@ namespace SevenTiny.Bantina.Bankinate
             DataBaseName = DataBaseAttribute.GetName(typeof(TDataBase));
         }
 
-        internal override void CreateDbConnection(string connectionString)
-        {
-            DbConnection = new SqlConnection(connectionString);
-        }
-        internal override void CreateDbCommand()
-        {
-            DbCommand = new SqlCommand();
-            DbCommand.Connection = this.DbConnection;
-        }
-        internal override void CreateDbDataAdapter()
-        {
-            DbDataAdapter = new SqlDataAdapter();
-            DbDataAdapter.SelectCommand = this.DbCommand;
-        }
-        internal override void CreateCommandTextGenerator() => CommandTextGenerator = new SqlServerCommandTextGenerator(this);
+        internal override DbConnection CreateDbConnection(string connectionString) => new SqlConnection(connectionString);
+        internal override DbCommand CreateDbCommand() => new SqlCommand(string.Empty, (SqlConnection)this.DbConnection);
+        internal override DbDataAdapter CreateDbDataAdapter() => new SqlDataAdapter((SqlCommand)this.DbCommand);
+        internal override CommandTextGeneratorBase CreateCommandTextGenerator() => new SqlServerCommandTextGenerator(this);
+
         /// <summary>
         /// 命令参数初始化
         /// </summary>

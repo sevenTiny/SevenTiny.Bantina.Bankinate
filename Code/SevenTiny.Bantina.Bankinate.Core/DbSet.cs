@@ -1,18 +1,18 @@
-﻿using System;
+﻿using SevenTiny.Bantina.Bankinate.DbContexts;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
-using SevenTiny.Bantina.Bankinate.DbContexts;
 
 namespace SevenTiny.Bantina.Bankinate.Core
 {
     /// <summary>
-    /// 对象操作实体集合
+    /// 对象操作实体集合,专用于强类型实体操作
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public class DbSet<TEntity> : ILinqQueryable<TEntity> where TEntity : class
     {
-        public DbSet(DbContext dbContext)
+        internal DbSet(DbContext dbContext)
         {
             DbContext = dbContext;
         }
@@ -20,7 +20,7 @@ namespace SevenTiny.Bantina.Bankinate.Core
         /// <summary>
         /// 操作上下文
         /// </summary>
-        public DbContext DbContext { get; set; }
+        private DbContext DbContext { get; set; }
 
         /// <summary>
         /// 获取查询提供器
@@ -29,62 +29,62 @@ namespace SevenTiny.Bantina.Bankinate.Core
 
         public bool Any()
         {
-            throw new NotImplementedException();
+            return Queryable.Any();
         }
 
         public long Count()
         {
-            throw new NotImplementedException();
+            return Queryable.Count();
         }
 
         public TEntity FirstOrDefault()
         {
-            throw new NotImplementedException();
+            return Queryable.FirstOrDefault();
         }
 
-        public IQueryable<TEntity> Limit(int count)
+        public ILinqQueryable<TEntity> Limit(int count)
         {
-            throw new NotImplementedException();
+            return Queryable.Limit(count);
         }
 
-        public IQueryable<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy)
+        public ILinqQueryable<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy)
         {
-            throw new NotImplementedException();
+            return Queryable.OrderBy(orderBy);
         }
 
-        public IQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy)
+        public ILinqQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy)
         {
-            throw new NotImplementedException();
+            return Queryable.OrderByDescending(orderBy);
         }
 
-        public IQueryable<TEntity> Paging(int pageIndex, int pageSize)
+        public ILinqQueryable<TEntity> Paging(int pageIndex, int pageSize)
         {
-            throw new NotImplementedException();
+            return Queryable.Paging(pageIndex, pageSize);
         }
 
-        public IQueryable<TEntity> Select(Expression<Func<TEntity, object>> columns)
+        public ILinqQueryable<TEntity> Select(Expression<Func<TEntity, object>> columns)
         {
-            throw new NotImplementedException();
+            return Queryable.Select(columns);
         }
 
         public object ToData()
         {
-            throw new NotImplementedException();
+            return Queryable.ToData();
         }
 
         public DataSet ToDataSet()
         {
-            throw new NotImplementedException();
+            return Queryable.ToDataSet();
         }
 
         public List<TEntity> ToList()
         {
-            throw new NotImplementedException();
+            return Queryable.ToList();
         }
 
-        public IQueryable<TEntity> Where(Expression<Func<TEntity, bool>> filter)
+        public ILinqQueryable<TEntity> Where(Expression<Func<TEntity, bool>> filter)
         {
-            throw new NotImplementedException();
+            return Queryable.Where(filter);
         }
     }
 }

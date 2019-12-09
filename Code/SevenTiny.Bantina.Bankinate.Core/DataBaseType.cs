@@ -53,7 +53,7 @@ namespace SevenTiny.Bantina.Bankinate
         /// </summary>
         /// <param name="dataBaseType"></param>
         /// <returns></returns>
-        public static DataBaseCategory GetCategory(this DataBaseType dataBaseType)
+        internal static DataBaseCategory GetCategory(this DataBaseType dataBaseType)
         {
             switch (dataBaseType)
             {

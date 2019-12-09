@@ -24,7 +24,7 @@ namespace SevenTiny.Bantina.Bankinate
     /// SqlQueryable的相关配置信息
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public abstract class SqlQueryableBase<TEntity> where TEntity : class
+    internal abstract class SqlQueryableBase<TEntity> where TEntity : class
     {
         public SqlQueryableBase(SqlDbContext _dbContext)
         {

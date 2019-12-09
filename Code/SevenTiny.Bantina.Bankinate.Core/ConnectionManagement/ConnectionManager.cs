@@ -67,24 +67,24 @@ namespace SevenTiny.Bantina.Bankinate.ConnectionManagement
         /// </summary>
         /// <param name="operationType"></param>
         /// <returns></returns>
-        internal void SetConnectionString(OperationType operationType)
+        internal string SetConnectionString(OperationType operationType)
         {
+            //写
+            if (operationType == OperationType.Write)
+            {
+                CurrentConnectionString = ConnectionString_Write;
+                return CurrentConnectionString;
+            }
+
+            //读
             //先校验下次执行的连接字符串
             if (!string.IsNullOrEmpty(NextConnectionString))
             {
                 CurrentConnectionString = NextConnectionString;
                 NextConnectionString = string.Empty;
-                return;
+                return CurrentConnectionString;
             }
 
-            //写
-            if (operationType == OperationType.Write)
-            {
-                CurrentConnectionString = ConnectionString_Write;
-                return;
-            }
-
-            //读
             if (ConnectionStrings_Read == null || !ConnectionStrings_Read.Any())
             {
                 CurrentConnectionString = ConnectionString_Write;
@@ -112,6 +112,7 @@ namespace SevenTiny.Bantina.Bankinate.ConnectionManagement
                         break;
                 }
             }
+            return CurrentConnectionString;
         }
 
         /// <summary>

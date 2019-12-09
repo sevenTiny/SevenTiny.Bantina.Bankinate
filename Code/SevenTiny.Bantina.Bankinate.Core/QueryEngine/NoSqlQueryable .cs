@@ -25,7 +25,7 @@ namespace SevenTiny.Bantina.Bankinate
     /// NoSQL强类型复杂查询器
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class NoSqlQueryable<TEntity> : NoSqlQueryableBase<TEntity>, ILinqQueryable<TEntity> where TEntity : class
+    internal class NoSqlQueryable<TEntity> : NoSqlQueryableBase<TEntity>, ILinqQueryable<TEntity> where TEntity : class
     {
         public NoSqlQueryable(NoSqlDbContext _dbContext) : base(_dbContext)
         {
@@ -46,27 +46,27 @@ namespace SevenTiny.Bantina.Bankinate
             throw new NotImplementedException();
         }
 
-        public IQueryable<TEntity> Limit(int count)
+        public ILinqQueryable<TEntity> Limit(int count)
         {
             throw new NotImplementedException();
         }
 
-        public IQueryable<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy)
+        public ILinqQueryable<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy)
         {
             throw new NotImplementedException();
         }
 
-        public IQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy)
+        public ILinqQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy)
         {
             throw new NotImplementedException();
         }
 
-        public IQueryable<TEntity> Paging(int pageIndex, int pageSize)
+        public ILinqQueryable<TEntity> Paging(int pageIndex, int pageSize)
         {
             throw new NotImplementedException();
         }
 
-        public IQueryable<TEntity> Select(Expression<Func<TEntity, object>> columns)
+        public ILinqQueryable<TEntity> Select(Expression<Func<TEntity, object>> columns)
         {
             throw new NotImplementedException();
         }
@@ -86,18 +86,13 @@ namespace SevenTiny.Bantina.Bankinate
             throw new NotImplementedException();
         }
 
-        public NoSqlQueryable<TEntity> Where(Expression<Func<TEntity, bool>> filter)
+        public ILinqQueryable<TEntity> Where(Expression<Func<TEntity, bool>> filter)
         {
             if (_where != null)
                 _where = _where.And(filter);
             else
                 _where = filter;
             return this;
-        }
-
-        IQueryable<TEntity> ILinqQueryable<TEntity>.Where(Expression<Func<TEntity, bool>> filter)
-        {
-            throw new NotImplementedException();
         }
 
         //public NoSqlQueryable<TEntity> Paging(int pageIndex, int pageSize)

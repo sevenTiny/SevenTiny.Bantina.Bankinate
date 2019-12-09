@@ -23,13 +23,13 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
     {
         protected SqlDbContext(string connectionString_Write, params string[] connectionStrings_Read) : base(connectionString_Write, connectionStrings_Read)
         {
-            ConnectionManager.SetConnectionString(OperationType.Write);     //初始化连接字符串
-            CreateDbConnection(ConnectionManager.CurrentConnectionString);  //初始化连接器
-            CreateDbCommand();                                              //初始化命令执行器
-            CreateDbDataAdapter();                                          //初始化集合访问器
-            AccessorInitializes();                                          //初始化访问器
-            CreateCommandTextGenerator();                                   //初始化SQL生成器
-            QueryExecutor = new QueryExecutor(this);                        //初始化SQL执行器
+            ConnectionManager.SetConnectionString(OperationType.Write);                     //初始化连接字符串
+            DbConnection = CreateDbConnection(ConnectionManager.CurrentConnectionString);   //初始化连接器
+            DbCommand = CreateDbCommand();                                                  //初始化命令执行器
+            DbDataAdapter = CreateDbDataAdapter();                                          //初始化集合访问器
+            AccessorInitializes();                                                          //初始化访问器
+            CommandTextGenerator = CreateCommandTextGenerator();                            //初始化SQL生成器
+            QueryExecutor = new QueryExecutor(this);                                        //初始化SQL执行器
         }
 
         #region 数据库管理
@@ -58,36 +58,36 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// <summary>
         /// 数据库连接管理器
         /// </summary>
-        internal DbConnection DbConnection { get; set; }
+        internal DbConnection DbConnection { get; private set; }
         /// <summary>
         /// 命令管理器
         /// </summary>
-        internal DbCommand DbCommand { get; set; }
+        internal DbCommand DbCommand { get; private set; }
         /// <summary>
         /// 结果集访问器
         /// </summary>
-        internal DbDataAdapter DbDataAdapter { get; set; }
+        internal DbDataAdapter DbDataAdapter { get; private set; }
         /// <summary>
         /// 命令生成器
         /// </summary>
-        internal CommandTextGeneratorBase CommandTextGenerator { get; set; }
+        internal CommandTextGeneratorBase CommandTextGenerator { get; private set; }
         /// <summary>
         /// 创建连接管理器
         /// </summary>
         /// <param name="connectionString"></param>
-        internal abstract void CreateDbConnection(string connectionString);
+        internal abstract DbConnection CreateDbConnection(string connectionString);
         /// <summary>
         /// 创建命令管理器
         /// </summary>
-        internal abstract void CreateDbCommand();
+        internal abstract DbCommand CreateDbCommand();
         /// <summary>
         /// 创建结果集访问器
         /// </summary>
-        internal abstract void CreateDbDataAdapter();
+        internal abstract DbDataAdapter CreateDbDataAdapter();
         /// <summary>
         /// 创建SQL生成器
         /// </summary>
-        internal abstract void CreateCommandTextGenerator();
+        internal abstract CommandTextGeneratorBase CreateCommandTextGenerator();
         /// <summary>
         /// 连接状态检查，如果关闭，则打开连接
         /// </summary>
@@ -109,6 +109,9 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// 初始化查询参数
         /// </summary>
         internal abstract void ParameterInitializes();
+        /// <summary>
+        /// 查询执行器
+        /// </summary>
         internal QueryExecutor QueryExecutor { get; private set; }
 
         /// <summary>
@@ -136,7 +139,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         #endregion
 
         /// <summary>
-        /// 事务处理
+        /// 快捷事务处理，异常出现事务回滚
         /// </summary>
         /// <param name="action"></param>
         public void Transaction(Action action)
@@ -160,7 +163,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             PropertyDataValidator.Verify(this, entity);
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Add(entity);
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             this.QueryExecutor.ExecuteNonQuery();
             DbCacheManager.Add(entity);
         }
@@ -169,13 +172,13 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             PropertyDataValidator.Verify(this, entity);
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Add(entity);
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();
             DbCacheManager.Add(entity);
         }
         public void Add<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             DbCommand.CommandType = CommandType.Text;
             foreach (var entity in entities)
             {
@@ -187,7 +190,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         }
         public async Task AddAsync<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             DbCommand.CommandType = CommandType.Text;
             foreach (var entity in entities)
             {
@@ -202,7 +205,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         {
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Delete(entity);
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             QueryExecutor.ExecuteNonQuery();
             DbCacheManager.Delete(entity);
         }
@@ -210,7 +213,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         {
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Delete(entity);
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();
             DbCacheManager.Delete(entity);
         }
@@ -218,7 +221,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         {
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Delete(filter);
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             QueryExecutor.ExecuteNonQuery();
             DbCacheManager.Delete(filter);
         }
@@ -226,7 +229,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         {
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Delete(filter);
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();
             DbCacheManager.Delete(filter);
         }
@@ -236,7 +239,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             PropertyDataValidator.Verify(this, entity);
             this.CommandTextGenerator.Update(entity, out Expression<Func<TEntity, bool>> filter);
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             QueryExecutor.ExecuteNonQuery();
             DbCacheManager.Update(entity, filter);
         }
@@ -245,7 +248,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             PropertyDataValidator.Verify(this, entity);
             this.CommandTextGenerator.Update(entity, out Expression<Func<TEntity, bool>> filter);
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();
             DbCacheManager.Update(entity, filter);
         }
@@ -254,7 +257,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             PropertyDataValidator.Verify(this, entity);
             this.CommandTextGenerator.Update(filter, entity);
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             QueryExecutor.ExecuteNonQuery();
             DbCacheManager.Update(entity, filter);
         }
@@ -263,19 +266,19 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             PropertyDataValidator.Verify(this, entity);
             this.CommandTextGenerator.Update(filter, entity);
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();
             DbCacheManager.Update(entity, filter);
         }
         #endregion
 
-        #region 弱类型的执行操作Api
+        #region SQL执行操作Api
         public int ExecuteSql(string sqlStatement, IDictionary<string, object> parms = null)
         {
             DbCommand.CommandType = CommandType.Text;
             this.SqlStatement = sqlStatement;
             this.Parameters = parms;
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             return QueryExecutor.ExecuteNonQuery();
         }
         public async Task<int> ExecuteSqlAsync(string sqlStatement, IDictionary<string, object> parms = null)
@@ -283,28 +286,28 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             this.SqlStatement = sqlStatement;
             this.Parameters = parms;
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             return await QueryExecutor.ExecuteNonQueryAsync();
         }
-        public int ExecuteStoredProcedure(string sqlStatement, IDictionary<string, object> parms = null)
+        public int ExecuteStoredProcedure(string storedProcedureName, IDictionary<string, object> parms = null)
         {
-            this.SqlStatement = sqlStatement;
+            this.SqlStatement = storedProcedureName;
             this.Parameters = parms;
             DbCommand.CommandType = CommandType.StoredProcedure;
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             return QueryExecutor.ExecuteNonQuery();
         }
-        public async Task<int> ExecuteStoredProcedureAsync(string sqlStatement, IDictionary<string, object> parms = null)
+        public async Task<int> ExecuteStoredProcedureAsync(string storedProcedureName, IDictionary<string, object> parms = null)
         {
-            this.SqlStatement = sqlStatement;
+            this.SqlStatement = storedProcedureName;
             this.Parameters = parms;
             DbCommand.CommandType = CommandType.StoredProcedure;
-            this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             return await QueryExecutor.ExecuteNonQueryAsync();
         }
         #endregion
 
-        #region 查询API
+        #region 强类型查询API
         /// <summary>
         /// SQL强类型复杂查询器
         /// </summary>
@@ -315,7 +318,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.DbCommand.CommandType = CommandType.Text;
             //重置命令生成器，防止上次查询参数被重用
             this.CreateCommandTextGenerator();
-            this.ConnectionManager.SetConnectionString(OperationType.Read);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Read);
             return new SqlQueryable<TEntity>(this);
         }
         /// <summary>
@@ -327,7 +330,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.DbCommand.CommandType = CommandType.Text;
             this.SqlStatement = sqlStatement;
             this.Parameters = parms;
-            this.ConnectionManager.SetConnectionString(OperationType.Read);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Read);
             return new SqlQueryable<TEntity>(this);
         }
         /// <summary>
@@ -339,7 +342,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.DbCommand.CommandType = CommandType.StoredProcedure;
             this.SqlStatement = storedProcedureName;
             this.Parameters = parms;
-            this.ConnectionManager.SetConnectionString(OperationType.Read);
+            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Read);
             return new SqlQueryable<TEntity>(this);
         }
         #endregion

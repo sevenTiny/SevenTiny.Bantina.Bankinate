@@ -5,7 +5,7 @@ namespace SevenTiny.Bantina.Bankinate
 {
     internal static class QueryEngineSelector
     {
-        public static ILinqQueryable<TEntity> Select<TEntity>(DataBaseType dataBaseType, DbContext dbContext) where TEntity : class
+        internal static ILinqQueryable<TEntity> Select<TEntity>(DataBaseType dataBaseType, DbContext dbContext) where TEntity : class
         {
             switch (dataBaseType.GetCategory())
             {

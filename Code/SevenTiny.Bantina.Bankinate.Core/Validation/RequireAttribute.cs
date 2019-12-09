@@ -13,6 +13,7 @@
 * Thx , Best Regards ~
 *********************************************************/
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 namespace SevenTiny.Bantina.Bankinate.Validation
