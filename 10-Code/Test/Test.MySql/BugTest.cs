@@ -26,7 +26,7 @@ namespace Test.MySql
         {
             using (var db = new BugDb())
             {
-                var re = db.Queryable<OperateTestModel>().Where(t => t.IntKey == 1 && t.Id != 2 && (t.StringKey.Contains("1") || t.StringKey.Contains("2"))).ToOne();
+                var re = db.Queryable<OperateTestModel>().Where(t => t.IntKey == 1 && t.Id != 2 && (t.StringKey.Contains("1") || t.StringKey.Contains("2"))).FirstOrDefault();
                 Assert.NotNull(re);
             }
         }

@@ -11,7 +11,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
     /// <summary>
     /// 数据上下文
     /// </summary>
-    public abstract class DbContext : IDbContext, IBaseOperate
+    public abstract class DbContext : IDbContext
     {
         protected DbContext(string connectionString_Write, params string[] connectionStrings_Read)
         {
@@ -22,6 +22,13 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
                 ConnectionManager = new ConnectionManager(connectionString_Write, connectionStrings_Read);
 
             DbCacheManager = new DbCacheManager(this);
+
+            foreach (var item in GetType().GetProperties())
+            {
+                //这里最好用fullname，调试时候获取到修改下
+                if (item.PropertyType.Name.Equals("DbSet`1"))
+                    item.SetValue(this, Activator.CreateInstance(item.PropertyType, new[] { this }));
+            }
         }
 
         #region Database Control 数据库管理
@@ -150,7 +157,6 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
 
         public void Dispose()
         {
-            GC.SuppressFinalize(this);
         }
     }
 }

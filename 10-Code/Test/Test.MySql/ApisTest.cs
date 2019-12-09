@@ -49,7 +49,7 @@ namespace Test.MySql
                 Assert.Equal(value, re1.First().IntKey);
 
                 //查询一条
-                var entity = db.Queryable<OperateTestModel>().Where(t => t.IntKey == value).ToOne();
+                var entity = db.Queryable<OperateTestModel>().Where(t => t.IntKey == value).FirstOrDefault();
                 Assert.NotNull(entity);
                 Assert.Equal(value, entity.IntKey);
 
@@ -64,7 +64,7 @@ namespace Test.MySql
                 entity.FloatNullKey = entity.IntNullKey;
                 db.Update<OperateTestModel>(entity);
 
-                var entity2 = db.Queryable<OperateTestModel>().Where(t => t.IntKey == value).ToOne();
+                var entity2 = db.Queryable<OperateTestModel>().Where(t => t.IntKey == value).FirstOrDefault();
                 Assert.NotNull(entity2);
                 Assert.Equal(value, entity2.IntNullKey);
                 Assert.Equal($"UpdateTest_{value}", entity2.StringKey);
@@ -104,7 +104,7 @@ namespace Test.MySql
                 Assert.Single(re1);
                 Assert.Equal(value, re1.First().IntKey);
 
-                var entity = db.Queryable<OperateTestModel>().Where(t => t.IntKey == value).ToOne();
+                var entity = db.Queryable<OperateTestModel>().Where(t => t.IntKey == value).FirstOrDefault();
                 Assert.NotNull(entity);
                 Assert.Equal(value, entity.IntKey);
 

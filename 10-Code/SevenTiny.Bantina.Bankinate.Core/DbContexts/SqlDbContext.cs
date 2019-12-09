@@ -19,7 +19,7 @@ using System.Linq;
 [assembly: InternalsVisibleTo("SevenTiny.Bantina.Bankinate.SqlServer")]
 namespace SevenTiny.Bantina.Bankinate.DbContexts
 {
-    public abstract class SqlDbContext : DbContext, IBaseOperate, IExecuteSqlOperate
+    public abstract class SqlDbContext : DbContext, IExecuteSql, ICacheable
     {
         protected SqlDbContext(string connectionString_Write, params string[] connectionStrings_Read) : base(connectionString_Write, connectionStrings_Read)
         {
@@ -310,11 +310,11 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <returns></returns>
-        public SqlQueryable<TEntity> Queryable<TEntity>() where TEntity : class
+        public ILinqQueryable<TEntity> Queryable<TEntity>() where TEntity : class
         {
+            this.DbCommand.CommandType = CommandType.Text;
             //重置命令生成器，防止上次查询参数被重用
             this.CreateCommandTextGenerator();
-            DbCommand.CommandType = CommandType.Text;
             this.ConnectionManager.SetConnectionString(OperationType.Read);
             return new SqlQueryable<TEntity>(this);
         }
@@ -322,25 +322,25 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// SQL弱类型复杂查询器
         /// </summary>
         /// <returns></returns>
-        public SqlQueryable Queryable(string sqlStatement, IDictionary<string, object> parms = null)
+        public IQueryable<TEntity> Queryable<TEntity>(string sqlStatement, IDictionary<string, object> parms = null) where TEntity : class
         {
+            this.DbCommand.CommandType = CommandType.Text;
             this.SqlStatement = sqlStatement;
             this.Parameters = parms;
-            DbCommand.CommandType = CommandType.Text;
             this.ConnectionManager.SetConnectionString(OperationType.Read);
-            return new SqlQueryable(this);
+            return new SqlQueryable<TEntity>(this);
         }
         /// <summary>
         /// 存储过程弱类型复杂查询器
         /// </summary>
         /// <returns></returns>
-        public StoredProcedureQueryable StoredProcedureQueryable(string storedProcedureName, IDictionary<string, object> parms = null)
+        public IQueryable<TEntity> StoredProcedureQueryable<TEntity>(string storedProcedureName, IDictionary<string, object> parms = null) where TEntity : class
         {
+            this.DbCommand.CommandType = CommandType.StoredProcedure;
             this.SqlStatement = storedProcedureName;
             this.Parameters = parms;
-            DbCommand.CommandType = CommandType.StoredProcedure;
             this.ConnectionManager.SetConnectionString(OperationType.Read);
-            return new StoredProcedureQueryable(this);
+            return new SqlQueryable<TEntity>(this);
         }
         #endregion
 

@@ -12,8 +12,11 @@
 * Description: 懒加载查询配置基类
 * Thx , Best Regards ~
 *********************************************************/
+using SevenTiny.Bantina.Bankinate.Attributes;
 using SevenTiny.Bantina.Bankinate.DbContexts;
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace SevenTiny.Bantina.Bankinate
 {
@@ -21,7 +24,7 @@ namespace SevenTiny.Bantina.Bankinate
     /// SqlQueryable的相关配置信息
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public abstract class SqlQueryableBase
+    public abstract class SqlQueryableBase<TEntity> where TEntity : class
     {
         public SqlQueryableBase(SqlDbContext _dbContext)
         {
@@ -35,5 +38,41 @@ namespace SevenTiny.Bantina.Bankinate
         public string SqlStatement => DbContext.DbCommand.CommandText;
         public string TableName => DbContext.TableName;
         public IDictionary<string, object> Parameters => DbContext.Parameters;
+
+        //where
+        protected Expression<Func<TEntity, bool>> _where = t => true;
+
+        //orderby
+        protected Expression<Func<TEntity, object>> _orderby;
+        protected bool _isDesc = false;
+
+        //paging
+        protected bool _isPaging = false;
+        protected int _pageIndex = 0;
+        protected int _pageSize = 0;
+
+        /// <summary>
+        /// 要查询的列
+        /// </summary>
+        protected Expression<Func<TEntity, object>> _columns;
+
+        /// <summary>
+        /// 必要条件检查
+        /// </summary>
+        protected void MustExistCheck()
+        {
+            if (_where == null)
+            {
+                throw new ArgumentNullException("Where condition deficiency");
+            }
+        }
+
+        /// <summary>
+        /// 获取TableName，并将其重新赋值
+        /// </summary>
+        protected void ReSetTableName()
+        {
+            DbContext.TableName = TableAttribute.GetName(typeof(TEntity));
+        }
     }
 }

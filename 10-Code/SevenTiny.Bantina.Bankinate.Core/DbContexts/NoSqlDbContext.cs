@@ -23,7 +23,6 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
 
         public new void Dispose()
         {
-            GC.SuppressFinalize(this);
             base.Dispose();
         }
     }

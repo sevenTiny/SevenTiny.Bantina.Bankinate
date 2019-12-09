@@ -5,7 +5,7 @@ namespace SevenTiny.Bantina.Bankinate
     /// <summary>
     /// 执行sql语句扩展Api
     /// </summary>
-    public interface IExecuteSqlOperate
+    public interface IExecuteSql
     {
         int ExecuteSql(string sqlStatement, IDictionary<string, object> parms = null);
     }

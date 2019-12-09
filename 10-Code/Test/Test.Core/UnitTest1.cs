@@ -8,7 +8,7 @@ namespace Test.Core
         [Fact]
         public void Test1()
         {
-
+            
         }
     }
 }

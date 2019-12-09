@@ -87,7 +87,7 @@ namespace Test.MySql
             {
                 for (int i = 0; i < count; i++)
                 {
-                    var re = db.Queryable<OperateTestModel>().Where(t => t.StringKey.Contains("test")).ToOne();
+                    var re = db.Queryable<OperateTestModel>().Where(t => t.StringKey.Contains("test")).FirstOrDefault();
 
                     if (i == 0)
                         Assert.True(!db.IsFromCache);
@@ -127,8 +127,8 @@ namespace Test.MySql
             {
                 for (int i = 0; i < count; i++)
                 {
-                    var re = db.Queryable<OperateTestModel>().Where(t => t.Id == 1).ToOne();
-                    var re1 = db.Queryable<OperateTestModel>().Where(t => t.Id == 2).ToOne();
+                    var re = db.Queryable<OperateTestModel>().Where(t => t.Id == 1).FirstOrDefault();
+                    var re1 = db.Queryable<OperateTestModel>().Where(t => t.Id == 2).FirstOrDefault();
 
                     if (i == 0)
                         Assert.True(!db.IsFromCache);
@@ -150,7 +150,7 @@ namespace Test.MySql
 
                 for (int i = 1; i <= count; i++)
                 {
-                    var re = db.Queryable<OperateTestModel>().Where(t => t.Id == i).ToOne();
+                    var re = db.Queryable<OperateTestModel>().Where(t => t.Id == i).FirstOrDefault();
 
                     Assert.True(!db.IsFromCache);
                     Assert.NotNull(re);
@@ -167,7 +167,7 @@ namespace Test.MySql
             {
                 for (int i = 0; i < count; i++)
                 {
-                    var re = db.Queryable<OperateTestModel>().Where(t => t.StringKey.Contains("test")).ToOne();
+                    var re = db.Queryable<OperateTestModel>().Where(t => t.StringKey.Contains("test")).FirstOrDefault();
                     Assert.NotNull(re);
                 }
             }

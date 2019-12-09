@@ -15,4 +15,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\SevenTiny.Bantina.Bankinate.Core\SevenTiny.Bantina.Bankinate.Core.csproj" />
+  </ItemGroup>
+
 </Project>

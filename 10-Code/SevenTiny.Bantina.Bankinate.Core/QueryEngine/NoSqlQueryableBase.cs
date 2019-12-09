@@ -55,27 +55,5 @@ namespace SevenTiny.Bantina.Bankinate
                 throw new ArgumentNullException("Where condition deficiency");
             }
         }
-
-        /// <summary>
-        /// 查询生成符合当前条件的List结果集
-        /// </summary>
-        /// <returns></returns>
-        public abstract List<TEntity> ToList();
-        /// <summary>
-        /// 查询生成符合当前条件的单个实体
-        /// </summary>
-        /// <returns></returns>
-        public abstract TEntity ToOne();
-        /// <summary>
-        /// 查询出符合当前条件的数据条数
-        /// </summary>
-        /// <returns></returns>
-        public abstract long Count();
-        /// <summary>
-        /// 查询是否有符合条件的记录数
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        public abstract bool Any();
     }
 }
