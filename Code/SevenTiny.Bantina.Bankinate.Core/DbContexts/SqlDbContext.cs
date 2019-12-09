@@ -138,6 +138,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
 
         #endregion
 
+        #region 事务
         /// <summary>
         /// 快捷事务处理，异常出现事务回滚
         /// </summary>
@@ -156,6 +157,28 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
                 throw ex;
             }
         }
+        /// <summary>
+        /// 开始事务
+        /// </summary>
+        public void TransactionBegin()
+        {
+            this.DbConnection.BeginTransaction();
+        }
+        /// <summary>
+        /// 提交事务
+        /// </summary>
+        public void TransactionCommit()
+        {
+            this.DbCommand.Transaction.Commit();
+        }
+        /// <summary>
+        /// 回滚事务
+        /// </summary>
+        public void TransactionRollback()
+        {
+            this.DbCommand.Transaction.Rollback();
+        }
+        #endregion
 
         #region 强类型的执行操作API
         public override void Add<TEntity>(TEntity entity)
