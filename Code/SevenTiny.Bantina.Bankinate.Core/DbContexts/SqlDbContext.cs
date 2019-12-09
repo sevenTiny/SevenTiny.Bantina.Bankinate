@@ -135,10 +135,9 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             }
             return MD5Helper.GetMd5Hash(SqlStatement);
         }
-
         #endregion
 
-        #region 事务
+        #region 事务控制
         /// <summary>
         /// 快捷事务处理，异常出现事务回滚
         /// </summary>
