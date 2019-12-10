@@ -4,7 +4,6 @@ using SevenTiny.Bantina.Bankinate.Configs;
 using SevenTiny.Bantina.Bankinate.SqlDataAccess;
 using SevenTiny.Bantina.Bankinate.Helpers;
 using SevenTiny.Bantina.Bankinate.SqlStatementManagement;
-using SevenTiny.Bantina.Bankinate.Validation;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -182,7 +181,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         #region 强类型的执行操作API
         public override void Add<TEntity>(TEntity entity)
         {
-            PropertyDataValidator.Verify(this, entity);
+            DataValidatorExecute(() => DataValidator.Verify(entity));
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Add(entity);
             this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
@@ -191,7 +190,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         }
         public override async Task AddAsync<TEntity>(TEntity entity)
         {
-            PropertyDataValidator.Verify(this, entity);
+            DataValidatorExecute(() => DataValidator.Verify(entity));
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Add(entity);
             this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
@@ -204,7 +203,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             foreach (var entity in entities)
             {
-                PropertyDataValidator.Verify(this, entity);
+                DataValidatorExecute(() => DataValidator.Verify(entity));
                 this.CommandTextGenerator.Add(entity);
                 this.QueryExecutor.ExecuteNonQuery();
             }
@@ -216,7 +215,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             foreach (var entity in entities)
             {
-                PropertyDataValidator.Verify(this, entity);
+                DataValidatorExecute(() => DataValidator.Verify(entity));
                 this.CommandTextGenerator.Add(entity);
                 await this.QueryExecutor.ExecuteNonQueryAsync();
             }
@@ -258,8 +257,8 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
 
         public void Update<TEntity>(TEntity entity) where TEntity : class
         {
+            DataValidatorExecute(() => DataValidator.Verify(entity));
             DbCommand.CommandType = CommandType.Text;
-            PropertyDataValidator.Verify(this, entity);
             this.CommandTextGenerator.Update(entity, out Expression<Func<TEntity, bool>> filter);
             this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             QueryExecutor.ExecuteNonQuery();
@@ -268,7 +267,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         public async Task UpdateAsync<TEntity>(TEntity entity) where TEntity : class
         {
             DbCommand.CommandType = CommandType.Text;
-            PropertyDataValidator.Verify(this, entity);
+            DataValidatorExecute(() => DataValidator.Verify(entity));
             this.CommandTextGenerator.Update(entity, out Expression<Func<TEntity, bool>> filter);
             this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();
@@ -277,7 +276,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         public override void Update<TEntity>(Expression<Func<TEntity, bool>> filter, TEntity entity)
         {
             DbCommand.CommandType = CommandType.Text;
-            PropertyDataValidator.Verify(this, entity);
+            DataValidatorExecute(() => DataValidator.Verify(entity));
             this.CommandTextGenerator.Update(filter, entity);
             this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             QueryExecutor.ExecuteNonQuery();
@@ -286,7 +285,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         public override async Task UpdateAsync<TEntity>(Expression<Func<TEntity, bool>> filter, TEntity entity)
         {
             DbCommand.CommandType = CommandType.Text;
-            PropertyDataValidator.Verify(this, entity);
+            DataValidatorExecute(() => DataValidator.Verify(entity));
             this.CommandTextGenerator.Update(filter, entity);
             this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();

@@ -3,9 +3,27 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
+using System.Reflection;
 
-namespace SevenTiny.Bantina.Bankinate.Core
+namespace SevenTiny.Bantina.Bankinate
 {
+    internal class DbSet
+    {
+        /// <summary>
+        /// DbSet属性初始化
+        /// </summary>
+        /// <param name="dbContext">数据库操作上下文</param>
+        internal static void PropertyInitialization(DbContext dbContext)
+        {
+            foreach (var item in dbContext.GetType().GetProperties(BindingFlags.Public))
+            {
+                //这里最好用fullname，调试时候获取到修改下
+                if (item.PropertyType.Name.Equals("DbSet`1"))
+                    item.SetValue(dbContext, Activator.CreateInstance(item.PropertyType, new[] { dbContext }));
+            }
+        }
+    }
+
     /// <summary>
     /// 对象操作实体集合,专用于强类型实体操作
     /// </summary>
@@ -22,6 +40,7 @@ namespace SevenTiny.Bantina.Bankinate.Core
         /// </summary>
         private DbContext DbContext { get; set; }
 
+        #region 查询操作
         /// <summary>
         /// 获取查询提供器
         /// </summary>
@@ -86,5 +105,6 @@ namespace SevenTiny.Bantina.Bankinate.Core
         {
             return Queryable.Where(filter);
         }
+        #endregion
     }
 }

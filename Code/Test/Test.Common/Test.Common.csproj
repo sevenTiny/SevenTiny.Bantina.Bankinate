@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SevenTiny.Bantina.Bankinate.Core\SevenTiny.Bantina.Bankinate.Core.csproj" />
+    <ProjectReference Include="..\..\SevenTiny.Bantina.Bankinate.Validation\SevenTiny.Bantina.Bankinate.Validation.csproj" />
   </ItemGroup>
 
 </Project>

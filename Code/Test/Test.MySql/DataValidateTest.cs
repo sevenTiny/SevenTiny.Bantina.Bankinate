@@ -1,5 +1,6 @@
 ﻿using SevenTiny.Bantina.Bankinate;
 using SevenTiny.Bantina.Bankinate.Attributes;
+using SevenTiny.Bantina.Bankinate.Validation;
 using System;
 using Test.Common;
 using Test.Common.Model;
@@ -19,8 +20,8 @@ namespace Test.MySql
         {
             public PropertyValidateDb() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
             {
-                OpenPropertyDataValidate = true;
-                OpenRealExecutionSaveToDb = false;
+                DataValidator = new DataValidator();
+                RealExecutionSaveToDb = false;
             }
         }
 

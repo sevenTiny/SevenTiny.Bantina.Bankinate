@@ -18,7 +18,7 @@ namespace Test.MySql
         {
             public ApiDb() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
             {
-                OpenRealExecutionSaveToDb = true;
+                RealExecutionSaveToDb = true;
             }
         }
 

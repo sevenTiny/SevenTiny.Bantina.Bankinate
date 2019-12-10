@@ -44,7 +44,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlDataAccess
         /// <returns></returns>
         public int ExecuteNonQuery()
         {
-            if (DbContext.OpenRealExecutionSaveToDb)
+            if (DbContext.RealExecutionSaveToDb)
             {
                 DbContext.ParameterInitializes();
                 DbContext.ConnectionStatusCheck();
@@ -54,7 +54,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlDataAccess
         }
         public Task<int> ExecuteNonQueryAsync()
         {
-            if (DbContext.OpenRealExecutionSaveToDb)
+            if (DbContext.RealExecutionSaveToDb)
             {
                 DbContext.ParameterInitializes();
                 DbContext.ConnectionStatusCheck();
@@ -70,7 +70,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlDataAccess
         /// <returns></returns>
         public object ExecuteScalar()
         {
-            if (DbContext.OpenRealExecutionSaveToDb)
+            if (DbContext.RealExecutionSaveToDb)
             {
                 DbContext.ParameterInitializes();
                 DbContext.ConnectionStatusCheck();
@@ -80,7 +80,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlDataAccess
         }
         public Task<object> ExecuteScalarAsync()
         {
-            if (DbContext.OpenRealExecutionSaveToDb)
+            if (DbContext.RealExecutionSaveToDb)
             {
                 DbContext.ParameterInitializes();
                 DbContext.ConnectionStatusCheck();
@@ -96,7 +96,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlDataAccess
         /// <returns></returns>
         public DbDataReader ExecuteReader()
         {
-            if (DbContext.OpenRealExecutionSaveToDb)
+            if (DbContext.RealExecutionSaveToDb)
             {
                 DbContext.ParameterInitializes();
                 DbContext.ConnectionStatusCheck();
@@ -114,7 +114,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlDataAccess
         /// <returns></returns> 
         public DataTable ExecuteDataTable()
         {
-            if (DbContext.OpenRealExecutionSaveToDb)
+            if (DbContext.RealExecutionSaveToDb)
             {
                 DataSet ds = ExecuteDataSet();
                 if (ds != null && ds.Tables != null && ds.Tables.Count > 0)
@@ -133,7 +133,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlDataAccess
         /// <returns></returns>
         public DataSet ExecuteDataSet()
         {
-            if (DbContext.OpenRealExecutionSaveToDb)
+            if (DbContext.RealExecutionSaveToDb)
             {
                 DbContext.ParameterInitializes();
                 DbContext.ConnectionStatusCheck();
@@ -264,7 +264,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlDataAccess
         /// <returns></returns>
         public List<Entity> GetListFromDataSetV2<Entity>(DataSet ds) where Entity : class
         {
-            if (DbContext.OpenRealExecutionSaveToDb)
+            if (DbContext.RealExecutionSaveToDb)
             {
                 DataTable dt = ds.Tables[0];
                 if (dt.Rows.Count > 0)
@@ -283,7 +283,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlDataAccess
         }
         public Entity GetEntityFromDataSetV2<Entity>(DataSet ds) where Entity : class
         {
-            if (DbContext.OpenRealExecutionSaveToDb)
+            if (DbContext.RealExecutionSaveToDb)
             {
                 DataTable dt = ds.Tables[0];// 获取到ds的dt
                 if (dt.Rows.Count > 0)

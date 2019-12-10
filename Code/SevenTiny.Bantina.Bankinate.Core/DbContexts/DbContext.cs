@@ -23,12 +23,8 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
 
             DbCacheManager = new DbCacheManager(this);
 
-            foreach (var item in GetType().GetProperties())
-            {
-                //这里最好用fullname，调试时候获取到修改下
-                if (item.PropertyType.Name.Equals("DbSet`1"))
-                    item.SetValue(this, Activator.CreateInstance(item.PropertyType, new[] { this }));
-            }
+            //初始化DbSet字段值
+            DbSet.PropertyInitialization(this);
         }
 
         #region Database Control 数据库管理
@@ -51,7 +47,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// <summary>
         /// 真实执行持久化操作开关，如果为false，则只执行准备动作，不实际操作数据库（友情提示：测试框架代码执行情况可以将其关闭）
         /// </summary>
-        public bool OpenRealExecutionSaveToDb { get; protected set; } = true;
+        public bool RealExecutionSaveToDb { get; protected set; } = true;
         #endregion
 
         #region Cache Control 缓存管理
@@ -133,14 +129,22 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// <typeparam name="TEntity"></typeparam>
         /// <returns></returns>
         internal abstract List<TEntity> GetFullCollectionData<TEntity>() where TEntity : class;
-
         #endregion
 
         #region Validate Control 校验管理
         /// <summary>
-        /// 属性值校验开关，如开启，则Add/Update等操作会校验输入的值是否满足特性标签标识的条件
+        /// 属性值校验器
         /// </summary>
-        public bool OpenPropertyDataValidate { get; protected set; } = false;
+        public IDataValidator DataValidator { get; set; }
+        /// <summary>
+        /// 校验开启校验并执行校验
+        /// </summary>
+        /// <param name="action"></param>
+        protected void DataValidatorExecute(Action action)
+        {
+            if (DataValidator != null)
+                action();
+        }
         #endregion
 
         #region Operate 标准API

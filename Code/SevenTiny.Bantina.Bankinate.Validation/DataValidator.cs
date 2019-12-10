@@ -12,7 +12,6 @@
 * Description: 
 * Thx , Best Regards ~
 *********************************************************/
-using SevenTiny.Bantina.Bankinate.DbContexts;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,14 +20,10 @@ namespace SevenTiny.Bantina.Bankinate.Validation
     /// <summary>
     /// 字段值合法性校验器
     /// </summary>
-    internal class PropertyDataValidator
+    public class DataValidator : IDataValidator
     {
-        public static void Verify<TEntity>(DbContext context, TEntity entity) where TEntity : class
+        public void Verify<TEntity>(TEntity entity) where TEntity : class
         {
-            //判断是否开启字段值校验
-            if (!context.OpenPropertyDataValidate)
-                return;
-
             if (entity == null)
                 return;
 
@@ -47,12 +42,8 @@ namespace SevenTiny.Bantina.Bankinate.Validation
             }
         }
 
-        public static void Verify<TEntity>(DbContext context, IEnumerable<TEntity> entities) where TEntity : class
+        public void Verify<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
-            //判断是否开启字段值校验
-            if (!context.OpenPropertyDataValidate)
-                return;
-
             if (entities == null || !entities.Any())
                 return;
 
