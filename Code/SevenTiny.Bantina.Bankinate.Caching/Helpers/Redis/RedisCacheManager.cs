@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace SevenTiny.Bantina.Bankinate.Helpers.Redis
+namespace SevenTiny.Bantina.Bankinate.Caching.Helpers.Redis
 {
     internal class RedisCacheManager : RedisServerManager, IRedisCache
     {

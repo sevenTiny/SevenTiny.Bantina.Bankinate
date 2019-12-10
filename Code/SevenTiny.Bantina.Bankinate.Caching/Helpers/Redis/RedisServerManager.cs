@@ -2,7 +2,7 @@
 using System;
 using System.Threading;
 
-namespace SevenTiny.Bantina.Bankinate.Helpers.Redis
+namespace SevenTiny.Bantina.Bankinate.Caching.Helpers.Redis
 {
     internal abstract class RedisServerManager
     {

@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel;
 
-namespace SevenTiny.Bantina.Bankinate.Helpers
+namespace SevenTiny.Bantina.Bankinate.Caching.Helpers
 {
     internal class TypeConvertHelper
     {

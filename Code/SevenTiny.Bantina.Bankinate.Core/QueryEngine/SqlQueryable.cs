@@ -116,7 +116,7 @@ namespace SevenTiny.Bantina.Bankinate
                 DbContext.CommandTextGenerator.QueryableQuery<TEntity>();
             }
 
-            return DbContext.DbCacheManager.GetEntities(_where, () =>
+            return DbContext.DbCacheManagerExecute((m, r) => m.GetEntities(_where, r), () =>
             {
                 return DbContext.QueryExecutor.ExecuteList<TEntity>();
             });
@@ -137,10 +137,10 @@ namespace SevenTiny.Bantina.Bankinate
             Limit(1);
             DbContext.CommandTextGenerator.QueryableQuery<TEntity>();
 
-            return DbContext.DbCacheManager.GetEntity(_where, () =>
-           {
-               return DbContext.QueryExecutor.ExecuteEntity<TEntity>();
-           });
+            return DbContext.DbCacheManagerExecute((m, r) => m.GetEntity(_where, r), () =>
+            {
+                return DbContext.QueryExecutor.ExecuteEntity<TEntity>();
+            });
         }
 
         public long Count()
@@ -152,10 +152,10 @@ namespace SevenTiny.Bantina.Bankinate
             DbContext.CommandTextGenerator.SetWhere(_where);
             DbContext.CommandTextGenerator.QueryableCount<TEntity>();
 
-            return DbContext.DbCacheManager.GetCount(_where, () =>
-           {
-               return Convert.ToInt32(DbContext.QueryExecutor.ExecuteScalar());
-           });
+            return DbContext.DbCacheManagerExecute((m, r) => m.GetCount(_where, r), () =>
+            {
+                return Convert.ToInt64(DbContext.QueryExecutor.ExecuteScalar());
+            });
         }
 
         public bool Any()
@@ -167,9 +167,9 @@ namespace SevenTiny.Bantina.Bankinate
             DbContext.CommandTextGenerator.SetWhere(_where);
             DbContext.CommandTextGenerator.QueryableAny<TEntity>(); //内部 Limit(1)
 
-            return DbContext.DbCacheManager.GetCount(_where, () =>
+            return DbContext.DbCacheManagerExecute((m, r) => m.GetCount(_where, r), () =>
             {
-                return Convert.ToInt32(DbContext.QueryExecutor.ExecuteScalar());
+                return Convert.ToInt64(DbContext.QueryExecutor.ExecuteScalar());
             }) > 0;
         }
 

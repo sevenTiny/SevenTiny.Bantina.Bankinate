@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SevenTiny.Bantina.Bankinate.Helpers.Redis
+namespace SevenTiny.Bantina.Bankinate.Caching.Helpers.Redis
 {
     internal interface IRedisCache
     {

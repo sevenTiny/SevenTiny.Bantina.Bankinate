@@ -1,8 +1,6 @@
-﻿using SevenTiny.Bantina.Bankinate.Configs;
+﻿using SevenTiny.Bantina.Bankinate.Caching.Helpers;
 using SevenTiny.Bantina.Bankinate.DbContexts;
 using SevenTiny.Bantina.Bankinate.Extensions;
-using SevenTiny.Bantina.Bankinate.Helpers;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,16 +15,16 @@ namespace SevenTiny.Bantina.Bankinate.Caching
     ///     sql.HashCode(),值
     ///}
     /// </summary>
-    public class QueryCacheManager : CacheManagerBase
+    internal class QueryCacheManager : CacheManagerBase
     {
-        internal QueryCacheManager(DbContext context) : base(context) { }
+        internal QueryCacheManager(DbContext context, CacheOptions cacheOptions) : base(context, cacheOptions) { }
 
         /// <summary>
         /// 清空所有缓存
         /// </summary>
         public void FlushAllCache()
         {
-            if (CacheStorageManager.IsExist(BankinateConst.GetQueryCacheKeysCacheKey(DbContext.DataBaseName), out HashSet<string> keys))
+            if (CacheStorageManager.IsExist(CachingConst.GetQueryCacheKeysCacheKey(DbContext.DataBaseName), out HashSet<string> keys))
             {
                 foreach (var item in keys)
                 {
@@ -50,14 +48,14 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// <returns></returns>
         private string GetQueryCacheKey(string collectionName = null)
         {
-            string key = $"{BankinateConst.CacheKey_QueryCache}{collectionName ?? DbContext.CollectionName}";
+            string key = $"{CachingConst.CacheKey_QueryCache}{collectionName ?? DbContext.CollectionName}";
             //缓存键更新
-            if (!CacheStorageManager.IsExist(BankinateConst.GetQueryCacheKeysCacheKey(DbContext.DataBaseName), out HashSet<string> keys))
+            if (!CacheStorageManager.IsExist(CachingConst.GetQueryCacheKeysCacheKey(DbContext.DataBaseName), out HashSet<string> keys))
             {
                 keys = new HashSet<string>();
             }
             keys.Add(key);
-            CacheStorageManager.Put(BankinateConst.GetQueryCacheKeysCacheKey(DbContext.DataBaseName), keys, DbContext.MaxExpiredTimeSpan);
+            CacheStorageManager.Put(CachingConst.GetQueryCacheKeysCacheKey(DbContext.DataBaseName), keys, CacheOptions.MaxExpiredTimeSpan);
             return key;
         }
 
@@ -76,7 +74,7 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         internal T GetEntitiesFromCache<T>()
         {
             //1.检查是否开启了Query缓存
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
             {
                 //2.如果QueryCache里面有该缓存键，则直接获取，并从单个表单位中获取到对应sql的值
                 if (CacheStorageManager.IsExist(GetQueryCacheKey(), out Dictionary<string, object> t))
@@ -100,7 +98,7 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// <param name="cacheValue"></param>
         internal void CacheData<T>(T cacheValue)
         {
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
             {
                 if (cacheValue != null)
                 {
@@ -111,17 +109,17 @@ namespace SevenTiny.Bantina.Bankinate.Caching
                     if (CacheStorageManager.IsExist(queryCacheKey, out Dictionary<string, object> t))
                     {
                         //如果超出单表的query缓存键阈值，则按先后顺序进行移除
-                        if (t.Count >= DbContext.QueryCacheMaxCountPerTable)
+                        if (t.Count >= CacheOptions.QueryCacheMaxCountPerTable)
                             t.Remove(t.First().Key);
 
                         t.AddOrUpdate(sqlQueryCacheKey, cacheValue);
-                        CacheStorageManager.Put(queryCacheKey, t, DbContext.QueryCacheExpiredTimeSpan);
+                        CacheStorageManager.Put(queryCacheKey, t, CacheOptions.QueryCacheExpiredTimeSpan);
                     }
                     //如果缓存中没有表单位的缓存，则直接新增表单位的sql键缓存
                     else
                     {
                         var dic = new Dictionary<string, object> { { sqlQueryCacheKey, cacheValue } };
-                        CacheStorageManager.Put(queryCacheKey, dic, DbContext.QueryCacheExpiredTimeSpan);
+                        CacheStorageManager.Put(queryCacheKey, dic, CacheOptions.QueryCacheExpiredTimeSpan);
                     }
                 }
             }

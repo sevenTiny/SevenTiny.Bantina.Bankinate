@@ -1,4 +1,4 @@
-﻿namespace SevenTiny.Bantina.Bankinate
+﻿namespace SevenTiny.Bantina.Bankinate.Caching
 {
     /// <summary>
     /// 缓存存储媒介

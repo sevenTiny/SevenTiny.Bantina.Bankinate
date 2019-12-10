@@ -1,4 +1,5 @@
 ﻿using SevenTiny.Bantina.Bankinate.DbContexts;
+using SevenTiny.Bantina.Bankinate.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,22 +15,27 @@ namespace SevenTiny.Bantina.Bankinate.Caching
     /// </summary>
     public class DbCacheManager : CacheManagerBase, IDbCacheManager
     {
-        internal DbCacheManager(DbContext context) : base(context)
+        public DbCacheManager(DbContext context, CacheOptions cacheOptions) : base(context, cacheOptions)
         {
-            QueryCacheManager = new QueryCacheManager(context);
-            TableCacheManager = new TableCacheManager(context);
+            Ensure.ArgumentNotNullOrEmpty(context, nameof(context));
+            Ensure.ArgumentNotNullOrEmpty(cacheOptions, nameof(cacheOptions));
+
+            if (cacheOptions.OpenQueryCache)
+                QueryCacheManager = new QueryCacheManager(context, cacheOptions);
+            if (cacheOptions.OpenTableCache)
+                TableCacheManager = new TableCacheManager(context, cacheOptions);
         }
 
-        public QueryCacheManager QueryCacheManager { get; private set; }
-        public TableCacheManager TableCacheManager { get; private set; }
+        internal QueryCacheManager QueryCacheManager { get; private set; }
+        internal TableCacheManager TableCacheManager { get; private set; }
 
         /// 清空所有缓存
         /// </summary>
         public void FlushAllCache()
         {
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
                 QueryCacheManager.FlushAllCache();
-            if (DbContext.OpenTableCache)
+            if (CacheOptions.OpenTableCache)
                 TableCacheManager.FlushAllCache();
         }
         /// <summary>
@@ -37,55 +43,55 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// </summary>
         public void FlushCurrentCollectionCache(string collectionName = null)
         {
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
                 QueryCacheManager.FlushCollectionCache(collectionName);
-            if (DbContext.OpenTableCache)
+            if (CacheOptions.OpenTableCache)
                 TableCacheManager.FlushCollectionCache(collectionName);
         }
 
         public void Add<TEntity>(TEntity entity)
         {
             //1.清空Query缓存中关于该表的所有缓存记录
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
                 QueryCacheManager.FlushCollectionCache();
             //2.更新Table缓存中的该表记录
-            if (DbContext.OpenTableCache)
+            if (CacheOptions.OpenTableCache)
                 TableCacheManager.AddCache(entity);
         }
         public void Add<TEntity>(IEnumerable<TEntity> entities)
         {
             //1.清空Query缓存中关于该表的所有缓存记录
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
                 QueryCacheManager.FlushCollectionCache();
             //2.更新Table缓存中的该表记录
-            if (DbContext.OpenTableCache)
+            if (CacheOptions.OpenTableCache)
                 TableCacheManager.AddCache(entities);
         }
         public void Update<TEntity>(TEntity entity, Expression<Func<TEntity, bool>> filter)
         {
             //1.清空Query缓存中关于该表的所有缓存记录
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
                 QueryCacheManager.FlushCollectionCache();
             //2.更新Table缓存中的该表记录
-            if (DbContext.OpenTableCache)
+            if (CacheOptions.OpenTableCache)
                 TableCacheManager.UpdateCache(entity, filter);
         }
         public void Delete<TEntity>(Expression<Func<TEntity, bool>> filter)
         {
             //1.清空Query缓存中关于该表的所有缓存记录
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
                 QueryCacheManager.FlushCollectionCache();
             //2.更新Table缓存中的该表记录
-            if (DbContext.OpenTableCache)
+            if (CacheOptions.OpenTableCache)
                 TableCacheManager.DeleteCache(filter);
         }
         public void Delete<TEntity>(TEntity entity)
         {
             //1.清空Query缓存中关于该表的所有缓存记录
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
                 QueryCacheManager.FlushCollectionCache();
             //2.更新Table缓存中的该表记录
-            if (DbContext.OpenTableCache)
+            if (CacheOptions.OpenTableCache)
                 TableCacheManager.DeleteCache(entity);
         }
 
@@ -94,11 +100,11 @@ namespace SevenTiny.Bantina.Bankinate.Caching
             List<TEntity> entities = null;
 
             //1.判断是否在二级TableCache，如果没有，则进行二级缓存初始化逻辑
-            if (DbContext.OpenTableCache)
+            if (CacheOptions.OpenTableCache)
                 entities = TableCacheManager.GetEntitiesFromCache(filter);
 
             //2.判断是否在一级QueryCahe中
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
                 if (entities == null || !entities.Any())
                     entities = QueryCacheManager.GetEntitiesFromCache<List<TEntity>>();
 
@@ -118,11 +124,11 @@ namespace SevenTiny.Bantina.Bankinate.Caching
             TEntity result = null;
 
             //1.判断是否在二级TableCache，如果没有，则进行二级缓存初始化逻辑
-            if (DbContext.OpenTableCache)
+            if (CacheOptions.OpenTableCache)
                 result = TableCacheManager.GetEntitiesFromCache(filter)?.FirstOrDefault();
 
             //2.判断是否在一级QueryCahe中
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
                 if (result == null)
                     result = QueryCacheManager.GetEntitiesFromCache<TEntity>();
 
@@ -142,11 +148,11 @@ namespace SevenTiny.Bantina.Bankinate.Caching
             long? result = null;
 
             //1.判断是否在二级TableCache，如果没有，则进行二级缓存初始化逻辑
-            if (DbContext.OpenTableCache)
+            if (CacheOptions.OpenTableCache)
                 result = TableCacheManager.GetEntitiesFromCache(filter)?.Count;
 
             //2.判断是否在一级QueryCahe中
-            if (DbContext.OpenQueryCache)
+            if (CacheOptions.OpenQueryCache)
                 if (result == null)
                     result = QueryCacheManager.GetEntitiesFromCache<long?>();
 
@@ -166,7 +172,7 @@ namespace SevenTiny.Bantina.Bankinate.Caching
             T result = null;
 
             //1.判断是否在一级QueryCache中
-            if (DbContext.OpenTableCache)
+            if (CacheOptions.OpenTableCache)
                 result = QueryCacheManager.GetEntitiesFromCache<T>();
 
             //2.如果都没有，则直接从逻辑中获取
