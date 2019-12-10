@@ -29,8 +29,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SevenTiny.Bantina.Bankinate
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataBaseExtends", "DataBaseExtends", "{0527B152-D909-410D-8569-C587CA75EE15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SevenTiny.Bantina.Bankinate.Caching", "SevenTiny.Bantina.Bankinate.Caching\SevenTiny.Bantina.Bankinate.Caching.csproj", "{FCD27346-D4E3-40FB-B46C-971A3DC3334C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,10 +79,6 @@ Global
 		{F295736D-D468-4FD1-8466-5417C75FA180}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F295736D-D468-4FD1-8466-5417C75FA180}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F295736D-D468-4FD1-8466-5417C75FA180}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FCD27346-D4E3-40FB-B46C-971A3DC3334C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FCD27346-D4E3-40FB-B46C-971A3DC3334C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FCD27346-D4E3-40FB-B46C-971A3DC3334C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FCD27346-D4E3-40FB-B46C-971A3DC3334C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
