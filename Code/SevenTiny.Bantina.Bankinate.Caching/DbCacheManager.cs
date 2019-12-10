@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace SevenTiny.Bantina.Bankinate.CacheManagement
+namespace SevenTiny.Bantina.Bankinate.Caching
 {
     /// <summary>
     /// 数据库缓存管理器
@@ -12,7 +12,7 @@ namespace SevenTiny.Bantina.Bankinate.CacheManagement
     /// 一级缓存（QueryCache查询缓存），缓存简短查询中的缓存数据
     /// 二级缓存（TableCache表缓存），缓存整张表，需要标签配合使用
     /// </summary>
-    public class DbCacheManager : CacheManagerBase
+    public class DbCacheManager : CacheManagerBase, IDbCacheManager
     {
         internal DbCacheManager(DbContext context) : base(context)
         {
@@ -43,7 +43,7 @@ namespace SevenTiny.Bantina.Bankinate.CacheManagement
                 TableCacheManager.FlushCollectionCache(collectionName);
         }
 
-        internal void Add<TEntity>(TEntity entity)
+        public void Add<TEntity>(TEntity entity)
         {
             //1.清空Query缓存中关于该表的所有缓存记录
             if (DbContext.OpenQueryCache)
@@ -52,7 +52,7 @@ namespace SevenTiny.Bantina.Bankinate.CacheManagement
             if (DbContext.OpenTableCache)
                 TableCacheManager.AddCache(entity);
         }
-        internal void Add<TEntity>(IEnumerable<TEntity> entities)
+        public void Add<TEntity>(IEnumerable<TEntity> entities)
         {
             //1.清空Query缓存中关于该表的所有缓存记录
             if (DbContext.OpenQueryCache)
@@ -61,7 +61,7 @@ namespace SevenTiny.Bantina.Bankinate.CacheManagement
             if (DbContext.OpenTableCache)
                 TableCacheManager.AddCache(entities);
         }
-        internal void Update<TEntity>(TEntity entity, Expression<Func<TEntity, bool>> filter)
+        public void Update<TEntity>(TEntity entity, Expression<Func<TEntity, bool>> filter)
         {
             //1.清空Query缓存中关于该表的所有缓存记录
             if (DbContext.OpenQueryCache)
@@ -70,7 +70,7 @@ namespace SevenTiny.Bantina.Bankinate.CacheManagement
             if (DbContext.OpenTableCache)
                 TableCacheManager.UpdateCache(entity, filter);
         }
-        internal void Delete<TEntity>(Expression<Func<TEntity, bool>> filter)
+        public void Delete<TEntity>(Expression<Func<TEntity, bool>> filter)
         {
             //1.清空Query缓存中关于该表的所有缓存记录
             if (DbContext.OpenQueryCache)
@@ -79,7 +79,7 @@ namespace SevenTiny.Bantina.Bankinate.CacheManagement
             if (DbContext.OpenTableCache)
                 TableCacheManager.DeleteCache(filter);
         }
-        internal void Delete<TEntity>(TEntity entity)
+        public void Delete<TEntity>(TEntity entity)
         {
             //1.清空Query缓存中关于该表的所有缓存记录
             if (DbContext.OpenQueryCache)
@@ -89,7 +89,7 @@ namespace SevenTiny.Bantina.Bankinate.CacheManagement
                 TableCacheManager.DeleteCache(entity);
         }
 
-        internal List<TEntity> GetEntities<TEntity>(Expression<Func<TEntity, bool>> filter, Func<List<TEntity>> func) where TEntity : class
+        public List<TEntity> GetEntities<TEntity>(Expression<Func<TEntity, bool>> filter, Func<List<TEntity>> func) where TEntity : class
         {
             List<TEntity> entities = null;
 
@@ -113,7 +113,7 @@ namespace SevenTiny.Bantina.Bankinate.CacheManagement
 
             return entities;
         }
-        internal TEntity GetEntity<TEntity>(Expression<Func<TEntity, bool>> filter, Func<TEntity> func) where TEntity : class
+        public TEntity GetEntity<TEntity>(Expression<Func<TEntity, bool>> filter, Func<TEntity> func) where TEntity : class
         {
             TEntity result = null;
 
@@ -137,7 +137,7 @@ namespace SevenTiny.Bantina.Bankinate.CacheManagement
 
             return result;
         }
-        internal long GetCount<TEntity>(Expression<Func<TEntity, bool>> filter, Func<long> func) where TEntity : class
+        public long GetCount<TEntity>(Expression<Func<TEntity, bool>> filter, Func<long> func) where TEntity : class
         {
             long? result = null;
 
@@ -161,11 +161,11 @@ namespace SevenTiny.Bantina.Bankinate.CacheManagement
 
             return result ?? default(long);
         }
-        internal T GetObject<T>(Func<T> func) where T : class
+        public T GetObject<T>(Func<T> func) where T : class
         {
             T result = null;
 
-            //1.判断是否在一级QueryCahe中
+            //1.判断是否在一级QueryCache中
             if (DbContext.OpenTableCache)
                 result = QueryCacheManager.GetEntitiesFromCache<T>();
 

@@ -1,4 +1,4 @@
-﻿using SevenTiny.Bantina.Bankinate.CacheManagement;
+﻿using SevenTiny.Bantina.Bankinate.Caching;
 using SevenTiny.Bantina.Bankinate.Configs;
 using SevenTiny.Bantina.Bankinate.ConnectionManagement;
 using System;
@@ -54,7 +54,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// <summary>
         /// 
         /// </summary>
-        public DbCacheManager DbCacheManager { get; internal set; }
+        public IDbCacheManager DbCacheManager { get; internal set; }
         /// <summary>
         /// 一级缓存
         /// 查询条件级别的缓存（filter），可以暂时缓存根据查询条件查询到的数据

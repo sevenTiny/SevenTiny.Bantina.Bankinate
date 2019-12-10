@@ -1,6 +1,6 @@
 ﻿using SevenTiny.Bantina.Bankinate.DbContexts;
 
-namespace SevenTiny.Bantina.Bankinate.CacheManagement
+namespace SevenTiny.Bantina.Bankinate.Caching
 {
     public abstract class CacheManagerBase
     {

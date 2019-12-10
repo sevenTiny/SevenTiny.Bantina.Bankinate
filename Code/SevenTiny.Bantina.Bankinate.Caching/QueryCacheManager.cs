@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SevenTiny.Bantina.Bankinate.CacheManagement
+namespace SevenTiny.Bantina.Bankinate.Caching
 {
     /// <summary>
     /// 查询缓存管理器（一级缓存管理器）

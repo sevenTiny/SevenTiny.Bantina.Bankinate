@@ -1,5 +1,5 @@
 ﻿using SevenTiny.Bantina.Bankinate.Attributes;
-using SevenTiny.Bantina.Bankinate.CacheManagement;
+using SevenTiny.Bantina.Bankinate.Caching;
 using SevenTiny.Bantina.Bankinate.Configs;
 using SevenTiny.Bantina.Bankinate.SqlDataAccess;
 using SevenTiny.Bantina.Bankinate.Helpers;
