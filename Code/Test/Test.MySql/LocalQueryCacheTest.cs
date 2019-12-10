@@ -1,5 +1,6 @@
 ﻿using SevenTiny.Bantina.Bankinate;
 using SevenTiny.Bantina.Bankinate.Attributes;
+using SevenTiny.Bantina.Bankinate.Caching;
 using Test.Common;
 using Test.Common.Model;
 using Xunit;
@@ -13,7 +14,7 @@ namespace Test.MySql
         {
             public LocalQueryCache() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
             {
-                OpenQueryCache = true;//一级缓存开关
+                this.OpenLocalCache(true, false);
             }
         }
 
@@ -146,7 +147,7 @@ namespace Test.MySql
         {
             using (var db = new LocalQueryCache())
             {
-                db.DbCacheManager.FlushCurrentCollectionCache(db.GetTableName<OperateTestModel>());
+                db.FlushCurrentCollectionCache(db.GetTableName<OperateTestModel>());
 
                 for (int i = 1; i <= count; i++)
                 {

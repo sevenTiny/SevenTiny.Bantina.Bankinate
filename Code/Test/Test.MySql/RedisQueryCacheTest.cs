@@ -1,5 +1,6 @@
 ﻿using SevenTiny.Bantina.Bankinate;
 using SevenTiny.Bantina.Bankinate.Attributes;
+using SevenTiny.Bantina.Bankinate.Caching;
 using Test.Common;
 using Test.Common.Model;
 using Xunit;
@@ -13,9 +14,10 @@ namespace Test.MySql
         {
             public RedisQueryCache() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
             {
-                OpenQueryCache = true;//一级缓存开关
-                CacheMediaType = CacheMediaType.Redis;
-                CacheMediaServer = "192.168.1.110:39912";//redis服务器地址以及端口号
+                this.OpenRedisCache(true, false, "192.168.1.110:39912");
+                //OpenQueryCache = true;//一级缓存开关
+                //CacheMediaType = CacheMediaType.Redis;
+                //CacheMediaServer = "192.168.1.110:39912";//redis服务器地址以及端口号
             }
         }
 

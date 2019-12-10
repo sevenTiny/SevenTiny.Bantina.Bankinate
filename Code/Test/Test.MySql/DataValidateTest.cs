@@ -20,7 +20,7 @@ namespace Test.MySql
         {
             public PropertyValidateDb() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
             {
-                DataValidator = new DataValidator();
+                this.OpenDataValidation();
                 RealExecutionSaveToDb = false;
             }
         }

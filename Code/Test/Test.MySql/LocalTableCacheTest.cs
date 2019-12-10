@@ -1,5 +1,6 @@
 ﻿using SevenTiny.Bantina.Bankinate;
 using SevenTiny.Bantina.Bankinate.Attributes;
+using SevenTiny.Bantina.Bankinate.Caching;
 using Test.Common;
 using Test.Common.Model;
 using Xunit;
@@ -13,7 +14,7 @@ namespace Test.MySql
         {
             public LocalTableCache() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
             {
-                OpenTableCache = true;//二级缓存开关，表实体上的二级标签也需要提供
+                this.OpenLocalCache(false, true);
             }
         }
 

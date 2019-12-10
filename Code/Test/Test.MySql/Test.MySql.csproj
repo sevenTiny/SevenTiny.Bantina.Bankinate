@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SevenTiny.Bantina.Bankinate.Caching\SevenTiny.Bantina.Bankinate.Caching.csproj" />
     <ProjectReference Include="..\..\SevenTiny.Bantina.Bankinate.MySql\SevenTiny.Bantina.Bankinate.MySql.csproj" />
     <ProjectReference Include="..\Test.Common\Test.Common.csproj" />
   </ItemGroup>

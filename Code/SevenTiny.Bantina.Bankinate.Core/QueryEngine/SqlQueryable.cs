@@ -116,7 +116,7 @@ namespace SevenTiny.Bantina.Bankinate
                 DbContext.CommandTextGenerator.QueryableQuery<TEntity>();
             }
 
-            return DbContext.DbCacheManagerExecute((m, r) => m.GetEntities(_where, r), () =>
+            return DbContext.DbCacheManagerSafeExecute((m, r) => m.GetEntities(_where, r), () =>
             {
                 return DbContext.QueryExecutor.ExecuteList<TEntity>();
             });
@@ -137,7 +137,7 @@ namespace SevenTiny.Bantina.Bankinate
             Limit(1);
             DbContext.CommandTextGenerator.QueryableQuery<TEntity>();
 
-            return DbContext.DbCacheManagerExecute((m, r) => m.GetEntity(_where, r), () =>
+            return DbContext.DbCacheManagerSafeExecute((m, r) => m.GetEntity(_where, r), () =>
             {
                 return DbContext.QueryExecutor.ExecuteEntity<TEntity>();
             });
@@ -152,7 +152,7 @@ namespace SevenTiny.Bantina.Bankinate
             DbContext.CommandTextGenerator.SetWhere(_where);
             DbContext.CommandTextGenerator.QueryableCount<TEntity>();
 
-            return DbContext.DbCacheManagerExecute((m, r) => m.GetCount(_where, r), () =>
+            return DbContext.DbCacheManagerSafeExecute((m, r) => m.GetCount(_where, r), () =>
             {
                 return Convert.ToInt64(DbContext.QueryExecutor.ExecuteScalar());
             });
@@ -167,7 +167,7 @@ namespace SevenTiny.Bantina.Bankinate
             DbContext.CommandTextGenerator.SetWhere(_where);
             DbContext.CommandTextGenerator.QueryableAny<TEntity>(); //内部 Limit(1)
 
-            return DbContext.DbCacheManagerExecute((m, r) => m.GetCount(_where, r), () =>
+            return DbContext.DbCacheManagerSafeExecute((m, r) => m.GetCount(_where, r), () =>
             {
                 return Convert.ToInt64(DbContext.QueryExecutor.ExecuteScalar());
             }) > 0;
