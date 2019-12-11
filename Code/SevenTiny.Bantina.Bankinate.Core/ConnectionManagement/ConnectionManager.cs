@@ -27,7 +27,6 @@ namespace SevenTiny.Bantina.Bankinate.ConnectionManagement
 
             //初始化连接使用情况集合
             ConnectionStrings_Read.Distinct().ToArray().Foreach(item => connectionStatuses.Add(new ConnectionStatus { HashKey = item.GetHashCode(), ConnectionString = item, Count = 0 }));
-
         }
         /// <summary>
         /// 写数据的连接字符串
