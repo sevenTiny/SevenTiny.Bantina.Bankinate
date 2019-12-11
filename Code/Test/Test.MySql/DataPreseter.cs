@@ -30,13 +30,13 @@ namespace Test.MySql
             using (var db = new DataPreseterDb())
             {
                 //清空所有数据,并重置索引
-                db.ExecuteSql("truncate table " + db.GetTableName<OperateTestModel>());
+                db.ExecuteSql("truncate table " + db.GetTableName<OperationTest>());
 
                 //预置测试数据
-                List<OperateTestModel> models = new List<OperateTestModel>();
+                List<OperationTest> models = new List<OperationTest>();
                 for (int i = 1; i < 1001; i++)
                 {
-                    db.Add<OperateTestModel>(new OperateTestModel
+                    db.Add<OperationTest>(new OperationTest
                     {
                         Key2 = i,
                         StringKey = $"test_{i}",
