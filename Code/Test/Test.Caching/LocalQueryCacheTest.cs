@@ -42,117 +42,71 @@ namespace Test.Caching
             }
         }
 
-        [Theory]
-        [InlineData(100)]
-        public void QueryAll(int count)
+        [Fact]
+        public void QueryAll()
         {
             using (var db = new LocalQueryCache())
             {
-                for (int i = 0; i < count; i++)
-                {
-                    var re = db.Queryable<OperationTest>().ToList();
+                db.Queryable<OperationTest>().ToList();
 
-                    if (i == 0)
-                        Assert.True(!db.IsFromCache);
-                    else
-                        Assert.True(db.IsFromCache);
+                Assert.False(db.IsFromCache);
 
-                    Assert.Equal(1000, re.Count);
-                }
+                db.Queryable<OperationTest>().ToList();
+
+                Assert.True(db.IsFromCache);
             }
         }
 
-        [Theory]
-        [InlineData(100)]
-        public void QueryOne(int count)
+        [Fact]
+        public void QueryCount()
         {
             using (var db = new LocalQueryCache())
             {
-                for (int i = 0; i < count; i++)
-                {
-                    var re = db.Queryable<OperationTest>().Where(t => t.StringKey.Contains("test")).FirstOrDefault();
+                db.Queryable<OperationTest>().Where(t => t.StringKey.Contains("test")).Count();
 
-                    if (i == 0)
-                        Assert.True(!db.IsFromCache);
-                    else
-                        Assert.True(db.IsFromCache);
+                Assert.False(db.IsFromCache);
 
-                    Assert.NotNull(re);
-                }
+                var result = db.Queryable<OperationTest>().Where(t => t.StringKey.Contains("test")).Count();
+
+                Assert.True(db.IsFromCache);
+
+                Assert.Equal(0, result);
             }
         }
 
-        [Theory]
-        [InlineData(100)]
-        public void QueryCount(int count)
+        [Fact]
+        public void QueryWhereWithUnSameCondition()
         {
             using (var db = new LocalQueryCache())
             {
-                for (int i = 0; i < count; i++)
-                {
-                    var re = db.Queryable<OperationTest>().Where(t => t.StringKey.Contains("test")).Count();
+                db.Queryable<OperationTest>().Where(t => t.Id == 1).FirstOrDefault();
 
-                    if (i == 0)
-                        Assert.True(!db.IsFromCache);
-                    else
-                        Assert.True(db.IsFromCache);
+                Assert.False(db.IsFromCache);
 
-                    Assert.Equal(1000, re);
-                }
+                db.Queryable<OperationTest>().Where(t => t.Id == 2).FirstOrDefault();
+
+                Assert.False(db.IsFromCache);
             }
         }
 
-        [Theory]
-        [InlineData(100)]
-        public void QueryWhereWithUnSameCondition(int count)
-        {
-            using (var db = new LocalQueryCache())
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    var re = db.Queryable<OperationTest>().Where(t => t.Id == 1).FirstOrDefault();
-                    var re1 = db.Queryable<OperationTest>().Where(t => t.Id == 2).FirstOrDefault();
-
-                    if (i == 0)
-                        Assert.True(!db.IsFromCache);
-                    else
-                        Assert.True(db.IsFromCache);
-
-                    Assert.NotEqual(re.StringKey, re1.StringKey);
-                }
-            }
-        }
-
-        [Theory]
-        [InlineData(100)]
-        public void QueryWhereWithUnSameCondition2(int count)
-        {
-            using (var db = new LocalQueryCache())
-            {
-                db.FlushCurrentCollectionCache(db.GetTableName<OperationTest>());
-
-                for (int i = 1; i <= count; i++)
-                {
-                    var re = db.Queryable<OperationTest>().Where(t => t.Id == i).FirstOrDefault();
-
-                    Assert.True(!db.IsFromCache);
-                    Assert.NotNull(re);
-                }
-            }
-        }
-
-        [Theory]
-        [InlineData(100)]
+        [Fact]
         [Description("设置缓存过期时间进行测试")]
-        public void QueryCacheExpired(int count)
+        public void QueryCacheExpired()
         {
             using (var db = new LocalQueryCache())
             {
-                for (int i = 0; i < count; i++)
-                {
-                    var re = db.Queryable<OperationTest>().Where(t => t.StringKey.Contains("test")).FirstOrDefault();
-                    Assert.NotNull(re);
-                }
+                db.Queryable<OperationTest>().Where(t => t.Id == 1).FirstOrDefault();
+
+                Assert.False(db.IsFromCache);
+
+                //未完成/。。。。。。。。。。。
+
+
+
+
+                db.Queryable<OperationTest>().Where(t => t.Id == 1).FirstOrDefault();
+
+                Assert.False(db.IsFromCache);
             }
         }
 
