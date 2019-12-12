@@ -4,18 +4,19 @@
 //using Test.Common;
 //using Test.Common.Model;
 //using Xunit;
+//using bankinate = SevenTiny.Bantina.Bankinate;
 
-//namespace Test.MySql
+//namespace Test.Caching
 //{
-//    public class RedisQueryCacheTest
+//    public class RedisTableCacheTest
 //    {
 //        [DataBase("SevenTinyTest")]
-//        private class RedisQueryCache : MySqlDbContext<RedisQueryCache>
+//        private class RedisTableCache : MySqlDbContext<RedisTableCache>
 //        {
-//            public RedisQueryCache() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
+//            public RedisTableCache() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
 //            {
-//                this.OpenRedisCache(true, false, "192.168.1.110:39912");
-//                //OpenQueryCache = true;//一级缓存开关
+//                this.OpenRedisCache(false, true, "192.168.1.110:39912");
+//                //OpenTableCache = true;//二级缓存开关，表实体上的二级标签也需要提供
 //                //CacheMediaType = CacheMediaType.Redis;
 //                //CacheMediaServer = "192.168.1.110:39912";//redis服务器地址以及端口号
 //            }
@@ -24,7 +25,7 @@
 //        [Fact]
 //        public void QueryAdd()
 //        {
-//            using (var db = new RedisQueryCache())
+//            using (var db = new RedisTableCache())
 //            {
 //                //1.先查询肯定是没有的
 //                var re0 = db.Queryable<OperateTestModel>().Where(t => t.StringKey.StartsWith("CacheAddTest")).ToList();
@@ -67,7 +68,7 @@
 //        [InlineData(100)]
 //        public void QueryAll(int count)
 //        {
-//            using (var db = new RedisQueryCache())
+//            using (var db = new RedisTableCache())
 //            {
 //                for (int i = 0; i < count; i++)
 //                {
@@ -81,7 +82,7 @@
 //        [InlineData(100)]
 //        public void QueryOne(int count)
 //        {
-//            using (var db = new RedisQueryCache())
+//            using (var db = new RedisTableCache())
 //            {
 //                for (int i = 0; i < count; i++)
 //                {
@@ -95,7 +96,7 @@
 //        [InlineData(100)]
 //        public void QueryCount(int count)
 //        {
-//            using (var db = new RedisQueryCache())
+//            using (var db = new RedisTableCache())
 //            {
 //                for (int i = 0; i < count; i++)
 //                {
@@ -109,7 +110,7 @@
 //        [InlineData(100)]
 //        public void QueryWhereWithUnSameCondition(int count)
 //        {
-//            using (var db = new RedisQueryCache())
+//            using (var db = new RedisTableCache())
 //            {
 //                for (int i = 0; i < count; i++)
 //                {
@@ -125,7 +126,7 @@
 //        [Trait("desc", "设置缓存过期时间进行测试")]
 //        public void QueryCacheExpired(int count)
 //        {
-//            using (var db = new RedisQueryCache())
+//            using (var db = new RedisTableCache())
 //            {
 //                for (int i = 0; i < count; i++)
 //                {
@@ -141,7 +142,7 @@
 //        public void QueryBugRepaire2()
 //        {
 //            int metaObjectId = 1;
-//            using (var db = new RedisQueryCache())
+//            using (var db = new RedisTableCache())
 //            {
 //                for (int i = 0; i < 3; i++)
 //                {

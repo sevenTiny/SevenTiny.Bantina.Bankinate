@@ -97,92 +97,111 @@ namespace SevenTiny.Bantina.Bankinate.Caching
 
         public List<TEntity> GetEntities<TEntity>(Expression<Func<TEntity, bool>> filter, Func<List<TEntity>> func) where TEntity : class
         {
-            List<TEntity> entities = null;
+            DbContext.IsFromCache = false;
+
+            List<TEntity> result = null;
 
             //1.判断是否在二级TableCache，如果没有，则进行二级缓存初始化逻辑
             if (CacheOptions.OpenTableCache)
-                entities = TableCacheManager.GetEntitiesFromCache(filter);
+                result = TableCacheManager.GetEntitiesFromCache(filter);
+
+            if (DbContext.IsFromCache)
+                return result;
 
             //2.判断是否在一级QueryCahe中
             if (CacheOptions.OpenQueryCache)
-                if (entities == null || !entities.Any())
-                    entities = QueryCacheManager.GetEntitiesFromCache<List<TEntity>>();
+                result = QueryCacheManager.GetEntitiesFromCache<List<TEntity>>();
+
+            if (DbContext.IsFromCache)
+                return result;
 
             //3.如果都没有，则直接从逻辑中获取
-            if (entities == null || !entities.Any())
-            {
-                entities = func();
-                DbContext.IsFromCache = false;
-                //4.Query缓存存储逻辑（内涵缓存开启校验）
-                QueryCacheManager.CacheData(entities);
-            }
 
-            return entities;
+            result = func();
+
+            //4.Query缓存存储逻辑（内涵缓存开启校验）
+            if (CacheOptions.OpenQueryCache)
+                QueryCacheManager.CacheData(result);
+
+            return result;
         }
         public TEntity GetEntity<TEntity>(Expression<Func<TEntity, bool>> filter, Func<TEntity> func) where TEntity : class
         {
+            DbContext.IsFromCache = false;
+
             TEntity result = null;
 
             //1.判断是否在二级TableCache，如果没有，则进行二级缓存初始化逻辑
             if (CacheOptions.OpenTableCache)
                 result = TableCacheManager.GetEntitiesFromCache(filter)?.FirstOrDefault();
 
+            if (DbContext.IsFromCache)
+                return result;
+
             //2.判断是否在一级QueryCahe中
             if (CacheOptions.OpenQueryCache)
-                if (result == null)
-                    result = QueryCacheManager.GetEntitiesFromCache<TEntity>();
+                result = QueryCacheManager.GetEntitiesFromCache<TEntity>();
+
+            if (DbContext.IsFromCache)
+                return result;
 
             //3.如果都没有，则直接从逻辑中获取
-            if (result == null || result == default(TEntity))
-            {
-                result = func();
-                DbContext.IsFromCache = false;
-                //4.Query缓存存储逻辑（内涵缓存开启校验）
+            result = func();
+
+            //4.Query缓存存储逻辑（内含缓存开启校验）
+            if (CacheOptions.OpenQueryCache)
                 QueryCacheManager.CacheData(result);
-            }
 
             return result;
         }
         public long GetCount<TEntity>(Expression<Func<TEntity, bool>> filter, Func<long> func) where TEntity : class
         {
+            DbContext.IsFromCache = false;
+
             long? result = null;
 
             //1.判断是否在二级TableCache，如果没有，则进行二级缓存初始化逻辑
             if (CacheOptions.OpenTableCache)
                 result = TableCacheManager.GetEntitiesFromCache(filter)?.Count;
 
+            if (DbContext.IsFromCache)
+                return result ?? default(long);
+
             //2.判断是否在一级QueryCahe中
             if (CacheOptions.OpenQueryCache)
-                if (result == null)
-                    result = QueryCacheManager.GetEntitiesFromCache<long?>();
+                result = QueryCacheManager.GetEntitiesFromCache<long?>();
+
+            if (DbContext.IsFromCache)
+                return result ?? default(long);
 
             //3.如果都没有，则直接从逻辑中获取
-            if (result == null || result == default(long))
-            {
-                result = func();
-                DbContext.IsFromCache = false;
-                //4.Query缓存存储逻辑（内涵缓存开启校验）
+            result = func();
+
+            //4.Query缓存存储逻辑（内涵缓存开启校验）
+            if (CacheOptions.OpenQueryCache)
                 QueryCacheManager.CacheData(result);
-            }
 
             return result ?? default(long);
         }
         public T GetObject<T>(Func<T> func) where T : class
         {
+            DbContext.IsFromCache = false;
+
             T result = null;
 
             //1.判断是否在一级QueryCache中
-            if (CacheOptions.OpenTableCache)
+            if (CacheOptions.OpenQueryCache)
                 result = QueryCacheManager.GetEntitiesFromCache<T>();
 
+            if (DbContext.IsFromCache)
+                return result;
+
             //2.如果都没有，则直接从逻辑中获取
-            if (result == null)
-            {
-                result = func();
-                DbContext.IsFromCache = false;
-                //3.Query缓存存储逻辑（内涵缓存开启校验）
+            result = func();
+
+            //3.Query缓存存储逻辑（内涵缓存开启校验）
+            if (CacheOptions.OpenQueryCache)
                 QueryCacheManager.CacheData(result);
-            }
 
             return result;
         }

@@ -95,9 +95,6 @@ namespace SevenTiny.Bantina.Bankinate
 
         public List<TEntity> ToList()
         {
-            if (!string.IsNullOrEmpty(DbContext.SqlStatement))
-                return DbContext.QueryExecutor.ExecuteList<TEntity>();
-
             MustExistCheck();
             ReSetTableName();
 
@@ -124,9 +121,6 @@ namespace SevenTiny.Bantina.Bankinate
 
         public TEntity FirstOrDefault()
         {
-            if (!string.IsNullOrEmpty(DbContext.SqlStatement))
-                return DbContext.QueryExecutor.ExecuteEntity<TEntity>();
-
             MustExistCheck();
             ReSetTableName();
 
@@ -175,9 +169,6 @@ namespace SevenTiny.Bantina.Bankinate
 
         public object ToData()
         {
-            if (!string.IsNullOrEmpty(DbContext.SqlStatement))
-                return DbContext.QueryExecutor.ExecuteScalar();
-
             MustExistCheck();
             ReSetTableName();
 
@@ -193,9 +184,6 @@ namespace SevenTiny.Bantina.Bankinate
 
         public DataSet ToDataSet()
         {
-            if (!string.IsNullOrEmpty(DbContext.SqlStatement))
-                return DbContext.QueryExecutor.ExecuteDataSet();
-
             MustExistCheck();
             ReSetTableName();
 

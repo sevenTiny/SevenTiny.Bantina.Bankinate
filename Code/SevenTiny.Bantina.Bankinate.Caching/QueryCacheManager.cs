@@ -49,13 +49,15 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         private string GetQueryCacheKey(string collectionName = null)
         {
             string key = $"{CachingConst.CacheKey_QueryCache}{collectionName ?? DbContext.CollectionName}";
+
             //缓存键更新
             if (!CacheStorageManager.IsExist(CachingConst.GetQueryCacheKeysCacheKey(DbContext.DataBaseName), out HashSet<string> keys))
-            {
                 keys = new HashSet<string>();
-            }
+
             keys.Add(key);
+
             CacheStorageManager.Put(CachingConst.GetQueryCacheKeysCacheKey(DbContext.DataBaseName), keys, CacheOptions.MaxExpiredTimeSpan);
+
             return key;
         }
 
@@ -73,18 +75,14 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// <returns></returns>
         internal T GetEntitiesFromCache<T>()
         {
-            //1.检查是否开启了Query缓存
-            if (CacheOptions.OpenQueryCache)
+            //如果QueryCache里面有该缓存键，则直接获取，并从单个表单位中获取到对应sql的值
+            if (CacheStorageManager.IsExist(GetQueryCacheKey(), out Dictionary<string, object> t))
             {
-                //2.如果QueryCache里面有该缓存键，则直接获取，并从单个表单位中获取到对应sql的值
-                if (CacheStorageManager.IsExist(GetQueryCacheKey(), out Dictionary<string, object> t))
+                string sqlQueryCacheKey = GetSqlQueryCacheKey();
+                if (t.ContainsKey(sqlQueryCacheKey))
                 {
-                    string sqlQueryCacheKey = GetSqlQueryCacheKey();
-                    if (t.ContainsKey(sqlQueryCacheKey))
-                    {
-                        DbContext.IsFromCache = true;
-                        return TypeConvertHelper.ToGenericType<T>(t[sqlQueryCacheKey]);
-                    }
+                    DbContext.IsFromCache = true;
+                    return TypeConvertHelper.ToGenericType<T>(t[sqlQueryCacheKey]);
                 }
             }
 
@@ -98,30 +96,24 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// <param name="cacheValue"></param>
         internal void CacheData<T>(T cacheValue)
         {
-            if (CacheOptions.OpenQueryCache)
+            string sqlQueryCacheKey = GetSqlQueryCacheKey();
+            string queryCacheKey = GetQueryCacheKey();
+            //如果缓存中存在，则拿到表单位的缓存并更新
+            //这里用object类型进行存储，因为字典的value可能有list集合，int，object等多种类型，泛型使用会出现识别异常
+            if (CacheStorageManager.IsExist(queryCacheKey, out Dictionary<string, object> t))
             {
-                if (cacheValue != null)
-                {
-                    string sqlQueryCacheKey = GetSqlQueryCacheKey();
-                    string queryCacheKey = GetQueryCacheKey();
-                    //如果缓存中存在，则拿到表单位的缓存并更新
-                    //这里用object类型进行存储，因为字典的value可能有list集合，int，object等多种类型，泛型使用会出现识别异常
-                    if (CacheStorageManager.IsExist(queryCacheKey, out Dictionary<string, object> t))
-                    {
-                        //如果超出单表的query缓存键阈值，则按先后顺序进行移除
-                        if (t.Count >= CacheOptions.QueryCacheMaxCountPerTable)
-                            t.Remove(t.First().Key);
+                //如果超出单表的query缓存键阈值，则按先后顺序进行移除
+                if (t.Count >= CacheOptions.QueryCacheMaxCountPerTable)
+                    t.Remove(t.First().Key);
 
-                        t.AddOrUpdate(sqlQueryCacheKey, cacheValue);
-                        CacheStorageManager.Put(queryCacheKey, t, CacheOptions.QueryCacheExpiredTimeSpan);
-                    }
-                    //如果缓存中没有表单位的缓存，则直接新增表单位的sql键缓存
-                    else
-                    {
-                        var dic = new Dictionary<string, object> { { sqlQueryCacheKey, cacheValue } };
-                        CacheStorageManager.Put(queryCacheKey, dic, CacheOptions.QueryCacheExpiredTimeSpan);
-                    }
-                }
+                t.AddOrUpdate(sqlQueryCacheKey, cacheValue);
+                CacheStorageManager.Put(queryCacheKey, t, CacheOptions.QueryCacheExpiredTimeSpan);
+            }
+            //如果缓存中没有表单位的缓存，则直接新增表单位的sql键缓存
+            else
+            {
+                var dic = new Dictionary<string, object> { { sqlQueryCacheKey, cacheValue } };
+                CacheStorageManager.Put(queryCacheKey, dic, CacheOptions.QueryCacheExpiredTimeSpan);
             }
         }
     }
