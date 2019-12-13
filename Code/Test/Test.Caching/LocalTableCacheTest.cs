@@ -1,136 +1,116 @@
-﻿//using SevenTiny.Bantina.Bankinate;
-//using SevenTiny.Bantina.Bankinate.Attributes;
-//using SevenTiny.Bantina.Bankinate.Caching;
-//using Test.Common;
-//using Test.Common.Model;
-//using Xunit;
+﻿using SevenTiny.Bantina.Bankinate;
+using SevenTiny.Bantina.Bankinate.Attributes;
+using SevenTiny.Bantina.Bankinate.Caching;
+using System;
+using System.ComponentModel;
+using System.Threading;
+using Test.Common;
+using Test.Common.Model;
+using Xunit;
 
-//namespace Test.Caching
-//{
-//    public class LocalTableCacheTest
-//    {
-//        [DataBase("SevenTinyTest")]
-//        private class LocalTableCache : MySqlDbContext<LocalTableCache>
-//        {
-//            public LocalTableCache() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
-//            {
-//                this.OpenLocalCache(false, true);
-//            }
-//        }
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+namespace Test.Caching
+{
+    [Collection("#1")]
+    public class LocalTableCacheTest
+    {
+        /// <summary>
+        /// 缓存秒
+        /// </summary>
+        private const int _CacheSecends = 1;
 
-//        [Trait("DESC", "该方法和QueryAll放在一起可能冲突，分开进行执行单元测试")]
-//        [Fact]
-//        public void QueryAdd()
-//        {
-//            using (var db = new LocalTableCache())
-//            {
-//                //1.先查询肯定是没有的
-//                var re0 = db.Queryable<OperateTestModel>().Where(t => t.StringKey.StartsWith("CacheAddTest")).ToList();
-//                Assert.Null(re0);
+        [DataBase("SevenTinyTest")]
+        private class LocalTableCache : MySqlDbContext<LocalTableCache>
+        {
+            public LocalTableCache() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
+            {
+                this.OpenLocalCache(openTableCache: true, tableCacheExpiredTimeSpan: TimeSpan.FromSeconds(_CacheSecends));
+                RealExecutionSaveToDb = false;
+            }
+        }
 
-//                db.Add(new OperateTestModel
-//                {
-//                    IntKey = 123,
-//                    StringKey = "CacheAddTest123"
-//                });
+        [Fact]
+        public void QueryAll()
+        {
+            using (var db = new LocalTableCache())
+            {
+                db.FlushAllCache();
 
-//                //2.这时候查询应该有一条，这次查询才加入缓存
-//                var re = db.Queryable<OperateTestModel>().Where(t => t.StringKey.StartsWith("CacheAddTest")).ToList();
-//                Assert.Single(re);
+                db.Queryable<OperationTest>().ToList();
 
-//                //3.重复查询，这次是从缓存查的，还是一条
-//                var re2 = db.Queryable<OperateTestModel>().Where(t => t.StringKey.StartsWith("CacheAddTest")).ToList();
-//                Assert.Single(re2);
+                Assert.False(db.IsFromCache);
 
-//                //再次新增，清楚一级缓存
-//                db.Add(new OperateTestModel
-//                {
-//                    IntKey = 123,
-//                    StringKey = "CacheAddTest123"
-//                });
+                Thread.CurrentThread.Join(1000);
 
-//                //4.这次查应该从数据库查询，加入缓存，2条
-//                var re4 = db.Queryable<OperateTestModel>().Where(t => t.StringKey.StartsWith("CacheAddTest")).ToList();
-//                Assert.Equal(2, re4.Count);
+                db.Queryable<OperationTest>().ToList();
 
-//                db.Delete<OperateTestModel>(t => t.StringKey.StartsWith("CacheAddTest"));
+                Assert.True(db.IsFromCache);
+            }
+        }
 
-//                //4.删除完毕以后，查询是没有的
-//                var re3 = db.Queryable<OperateTestModel>().Where(t => t.StringKey.StartsWith("CacheAddTest")).ToList();
-//                Assert.Null(re3);
-//            }
-//        }
+        [Fact]
+        public void QueryCount()
+        {
+            using (var db = new LocalTableCache())
+            {
+                db.FlushAllCache();
 
-//        [Theory]
-//        [InlineData(100)]
-//        public void QueryAll(int count)
-//        {
-//            using (var db = new LocalTableCache())
-//            {
-//                for (int i = 0; i < count; i++)
-//                {
-//                    var re = db.Queryable<OperateTestModel>().ToList();
-//                    Assert.Equal(1000, re.Count);
-//                }
-//            }
-//        }
+                db.Queryable<OperationTest>().Where(t => t.StringKey.Contains("test")).Count();
 
-//        [Theory]
-//        [InlineData(100)]
-//        public void QueryOne(int count)
-//        {
-//            using (var db = new LocalTableCache())
-//            {
-//                for (int i = 0; i < count; i++)
-//                {
-//                    var re = db.Queryable<OperateTestModel>().Where(t => t.StringKey.Contains("test")).FirstOrDefault();
-//                    Assert.NotNull(re);
-//                }
-//            }
-//        }
+                Assert.False(db.IsFromCache);
 
-//        [Theory]
-//        [InlineData(100)]
-//        public void QueryCount(int count)
-//        {
-//            using (var db = new LocalTableCache())
-//            {
-//                for (int i = 0; i < count; i++)
-//                {
-//                    var re = db.Queryable<OperateTestModel>().Where(t => t.StringKey.Contains("test")).Count();
-//                    Assert.Equal(1000, re);
-//                }
-//            }
-//        }
+                var result = db.Queryable<OperationTest>().Where(t => t.StringKey.Contains("test")).Count();
 
-//        [Theory]
-//        [InlineData(100)]
-//        public void QueryWhereWithUnSameCondition(int count)
-//        {
-//            using (var db = new LocalTableCache())
-//            {
-//                for (int i = 0; i < count; i++)
-//                {
-//                    var re = db.Queryable<OperateTestModel>().Where(t => t.Id == 1).FirstOrDefault();
-//                    var re1 = db.Queryable<OperateTestModel>().Where(t => t.Id == 2).FirstOrDefault();
-//                    Assert.NotEqual(re.StringKey, re1.StringKey);
-//                }
-//            }
-//        }
+                Assert.False(db.IsFromCache);
 
-//        [Theory]
-//        [InlineData(100)]
-//        [Trait("desc", "设置缓存过期时间进行测试")]
-//        public void QueryCacheExpired(int count)
-//        {
-//            using (var db = new LocalTableCache())
-//            {
-//                for (int i = 0; i < count; i++)
-//                {
-//                    var re = db.Queryable<OperateTestModel>().Where(t => t.StringKey.Contains("test")).FirstOrDefault();
-//                    Assert.NotNull(re);
-//                }
-//            }
-//        }
-//    }
-//}
+                Assert.Equal(0, result);
+            }
+        }
+
+        [Fact]
+        public void QueryWhereWithUnSameCondition()
+        {
+            using (var db = new LocalTableCache())
+            {
+                db.FlushAllCache();
+
+                db.Queryable<OperationTest>().Where(t => t.Id == 1).FirstOrDefault();
+
+                Assert.False(db.IsFromCache);
+
+                db.Queryable<OperationTest>().Where(t => t.Id == 2).FirstOrDefault();
+
+                Assert.False(db.IsFromCache);
+            }
+        }
+
+        [Fact]
+        [Description("设置缓存过期时间进行测试")]
+        public void QueryCacheExpired()
+        {
+            using (var db = new LocalTableCache())
+            {
+                db.FlushAllCache();
+
+                //先查询肯定是没有的
+                db.Queryable<OperationTest>().Where(t => t.Id == 1).ToList();
+
+                Assert.False(db.IsFromCache);
+
+                Thread.CurrentThread.Join(1000);
+
+                //第二次在缓存中可以查到
+                db.Queryable<OperationTest>().Where(t => t.Id == 1).ToList();
+
+                Assert.True(db.IsFromCache);
+
+                Thread.Sleep(_CacheSecends * 1000);
+
+                //这时候查询应该从缓存获取不到
+                db.Queryable<OperationTest>().Where(t => t.Id == 1).ToList();
+
+                Assert.False(db.IsFromCache);
+            }
+        }
+    }
+}

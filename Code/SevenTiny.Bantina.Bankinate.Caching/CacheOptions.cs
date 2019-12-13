@@ -31,6 +31,10 @@ namespace SevenTiny.Bantina.Bankinate.Caching
                 {
                     MaxExpiredTimeSpan = value;
                 }
+                else if (value == default)
+                {
+                    value = CachingConst.QueryCacheExpiredTimeSpan;
+                }
                 _QueryCacheExpiredTimeSpan = value;
             }
         }
@@ -46,6 +50,10 @@ namespace SevenTiny.Bantina.Bankinate.Caching
                 if (value > MaxExpiredTimeSpan)
                 {
                     MaxExpiredTimeSpan = value;
+                }
+                else if (value == default)
+                {
+                    value = CachingConst.TableCacheExpiredTimeSpan;
                 }
                 _TableCacheExpiredTimeSpan = value;
             }

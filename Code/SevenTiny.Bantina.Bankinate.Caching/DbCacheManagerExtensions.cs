@@ -29,25 +29,9 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// <param name="dbContext">数据操作上下文</param>
         /// <param name="openQueryCache">是否开启一级缓存</param>
         /// <param name="openTableCache">是否开启二级缓存</param>
-        public static void OpenLocalCache(this DbContext dbContext, bool openQueryCache, bool openTableCache)
-        {
-            dbContext.DbCacheManagerInitialize(new DbCacheManager(dbContext,
-                new CacheOptions()
-                {
-                    OpenQueryCache = openQueryCache,
-                    OpenTableCache = openTableCache
-                }));
-        }
-
-        /// <summary>
-        /// 初始化本地缓存
-        /// </summary>
-        /// <param name="dbContext">数据操作上下文</param>
-        /// <param name="openQueryCache">是否开启一级缓存</param>
-        /// <param name="openTableCache">是否开启二级缓存</param>
         /// <param name="queryCacheExpiredTimeSpan">一级缓存过期时间</param>
         /// <param name="tableCacheExpiredTimeSpan">二级缓存过期时间</param>
-        public static void OpenLocalCache(this DbContext dbContext, bool openQueryCache, bool openTableCache, TimeSpan queryCacheExpiredTimeSpan, TimeSpan tableCacheExpiredTimeSpan)
+        public static void OpenLocalCache(this DbContext dbContext, bool openQueryCache = false, bool openTableCache = false, TimeSpan queryCacheExpiredTimeSpan = default(TimeSpan), TimeSpan tableCacheExpiredTimeSpan = default(TimeSpan))
         {
             dbContext.DbCacheManagerInitialize(new DbCacheManager(dbContext,
                 new CacheOptions()
@@ -66,7 +50,7 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// <param name="openQueryCache"></param>
         /// <param name="openTableCache"></param>
         /// <param name="cacheServer"></param>
-        public static void OpenRedisCache(this DbContext dbContext, bool openQueryCache, bool openTableCache, string cacheServer)
+        public static void OpenRedisCache(this DbContext dbContext, string cacheServer, bool openQueryCache = false, bool openTableCache = false)
         {
             Ensure.ArgumentNotNullOrEmpty(cacheServer, nameof(cacheServer));
 

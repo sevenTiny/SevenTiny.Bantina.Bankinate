@@ -212,11 +212,10 @@ namespace SevenTiny.Bantina.Bankinate.Caching
             string scanKey = $"{CachingConst.CacheKey_TableScanning}{DbContext.CollectionName}";
             //1.判断正在扫描键是否存在，如果存在，则返回null，继续等待扫描任务完成
             if (CacheStorageManager.IsExist(scanKey))
-            {
                 return;
-            }
+
             //2.如果没有扫描键，则执行后台扫描任务
-            Task.Run(() =>
+            Task.Factory.StartNew(() =>
             {
                 //设置扫描键，标识当前正在进行扫描
                 CacheStorageManager.Put(scanKey, 1, CachingConst.SpanScaningKeyExpiredTime);
@@ -226,17 +225,16 @@ namespace SevenTiny.Bantina.Bankinate.Caching
                     var tableName = TableAttribute.GetName(typeof(TEntity));
                     //双重校验当前缓存是否存在TableCache，防止多个进程在锁外等待，所释放后再次执行
                     if (CacheStorageManager.IsExist(GetTableCacheKey(tableName)))
-                    {
                         return;
-                    }
+
                     //如果过期时间为0，则取上下文的过期时间
                     TimeSpan timeSpan = tableCacheTimeSpan == TimeSpan.Zero ? CacheOptions.TableCacheExpiredTimeSpan : tableCacheTimeSpan;
+
                     //执行扫描全表任务，并将结果存入缓存中
                     var data = DbContext.GetFullCollectionData<TEntity>();
-                    if (data != null)
-                    {
-                        CacheStorageManager.Put(GetTableCacheKey(tableName), data, CacheOptions.TableCacheExpiredTimeSpan);
-                    }
+
+                    //如果没查到，会存个空的集合
+                    CacheStorageManager.Put(GetTableCacheKey(tableName), data ?? new List<TEntity>(), CacheOptions.TableCacheExpiredTimeSpan);
                 }
                 //将扫描键移除，表示已经扫描完成
                 CacheStorageManager.Delete(scanKey);

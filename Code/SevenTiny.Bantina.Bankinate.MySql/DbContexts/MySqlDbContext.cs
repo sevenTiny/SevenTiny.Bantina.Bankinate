@@ -41,6 +41,8 @@ namespace SevenTiny.Bantina.Bankinate
             //多线程下使用同一个Connection会出现问题，这里采用新的连接进行异步数据操作
             using (var db = new TableCacheDbContext(this.ConnectionManager.ConnectionString_Write, this.ConnectionManager.ConnectionStrings_Read))
             {
+                db.RealExecutionSaveToDb = this.RealExecutionSaveToDb;
+
                 db.DataBaseName = this.DataBaseName;
                 db.SqlStatement = $"SELECT * FROM {CollectionName}";
                 return db.QueryExecutor.ExecuteList<TEntity>();

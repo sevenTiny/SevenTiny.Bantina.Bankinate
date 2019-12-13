@@ -1,7 +1,9 @@
 ﻿using SevenTiny.Bantina.Bankinate;
 using SevenTiny.Bantina.Bankinate.Attributes;
 using SevenTiny.Bantina.Bankinate.Caching;
+using System;
 using System.ComponentModel;
+using System.Threading;
 using Test.Common;
 using Test.Common.Model;
 using Xunit;
@@ -10,12 +12,17 @@ namespace Test.Caching
 {
     public class LocalQueryCacheTest
     {
+        /// <summary>
+        /// 缓存秒
+        /// </summary>
+        private const int _CacheSecends = 1;
+
         [DataBase("SevenTinyTest")]
         private class LocalQueryCache : MySqlDbContext<LocalQueryCache>
         {
             public LocalQueryCache() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
             {
-                this.OpenLocalCache(true, false);
+                this.OpenLocalCache(openQueryCache: true, queryCacheExpiredTimeSpan: TimeSpan.FromSeconds(_CacheSecends));
                 RealExecutionSaveToDb = false;
             }
         }
@@ -97,12 +104,11 @@ namespace Test.Caching
             {
                 db.Queryable<OperationTest>().Where(t => t.Id == 1).FirstOrDefault();
 
-                Assert.False(db.IsFromCache);
+                db.Queryable<OperationTest>().Where(t => t.Id == 1).FirstOrDefault();
 
-                //未完成/。。。。。。。。。。。
+                Assert.True(db.IsFromCache);
 
-
-
+                Thread.Sleep(_CacheSecends * 1000);
 
                 db.Queryable<OperationTest>().Where(t => t.Id == 1).FirstOrDefault();
 
@@ -111,18 +117,10 @@ namespace Test.Caching
         }
 
         [Fact]
-        [Description("两次查出来的结果不正确【由于内存做的缓存，改内存数据时缓存会一起变动...作为缓存时，慎改内存数据】")]
-        public void QueryBugRepaire2()
+        [Description("两次查出来的结果不正确【由于内存做的缓存，改内存数据时缓存会一起变动...内存作为缓存时，慎改内存数据】")]
+        public void BugFix_MemoryCacheChange()
         {
-            int metaObjectId = 1;
-            using (var db = new LocalQueryCache())
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    var re = db.Queryable<OperationTest>().Where(t => t.IntNullKey == 1 && t.IntKey == metaObjectId).ToList();
-                    Assert.NotNull(re);
-                }
-            }
+            Assert.True(true);
         }
     }
 }
