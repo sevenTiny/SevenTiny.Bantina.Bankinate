@@ -11,7 +11,6 @@ using Xunit;
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Test.Caching
 {
-    [Collection("#1")]
     public class LocalTableCacheTest
     {
         /// <summary>

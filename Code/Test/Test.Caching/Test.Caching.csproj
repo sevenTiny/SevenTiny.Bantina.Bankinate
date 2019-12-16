@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -20,6 +20,12 @@
     <ProjectReference Include="..\..\SevenTiny.Bantina.Bankinate.Caching\SevenTiny.Bantina.Bankinate.Caching.csproj" />
     <ProjectReference Include="..\..\SevenTiny.Bantina.Bankinate.MySql\SevenTiny.Bantina.Bankinate.MySql.csproj" />
     <ProjectReference Include="..\Test.Common\Test.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
