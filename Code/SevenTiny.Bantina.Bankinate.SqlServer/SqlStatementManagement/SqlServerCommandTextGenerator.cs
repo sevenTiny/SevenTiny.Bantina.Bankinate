@@ -35,7 +35,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlServer.SqlStatementManagement
         }
         public override void SetLimit(int count)
         {
-            _limit = $"TOP {count}";
+            _limit = $" TOP {count}";
         }
         public override void SetAlias(string alias)
         {
@@ -247,7 +247,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlServer.SqlStatementManagement
         public override string QueryableQuery<TEntity>()
         {
             string queryColumns = (_columns == null || !_columns.Any()) ? "*" : string.Join(",", _columns.Select(t => $"{_alias}.{t}"));
-            return DbContext.SqlStatement = $"SELECT {_limit} {queryColumns} FROM {DbContext.TableName} {_alias} {_where} {_orderBy}".TrimEnd();
+            return DbContext.SqlStatement = $"SELECT{_limit} {queryColumns} FROM {DbContext.TableName} {_alias} {_where} {_orderBy}".TrimEnd();
         }
         public override string QueryablePaging<TEntity>()
         {
@@ -258,7 +258,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlServer.SqlStatementManagement
         public override string QueryableAny<TEntity>()
         {
             SetLimit(1);
-            return DbContext.SqlStatement = $"SELECT {_limit} 1 FROM {DbContext.TableName} {_alias} {_where}".TrimEnd();
+            return DbContext.SqlStatement = $"SELECT{_limit} 1 FROM {DbContext.TableName} {_alias} {_where}".TrimEnd();
         }
     }
 }

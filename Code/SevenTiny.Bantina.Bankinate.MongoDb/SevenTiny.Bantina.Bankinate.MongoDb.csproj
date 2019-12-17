@@ -16,7 +16,10 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.8.1" />
-    <PackageReference Include="SevenTiny.Bantina.Bankinate.Core" Version="1.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SevenTiny.Bantina.Bankinate.Core\SevenTiny.Bantina.Bankinate.Core.csproj" />
   </ItemGroup>
 
 </Project>

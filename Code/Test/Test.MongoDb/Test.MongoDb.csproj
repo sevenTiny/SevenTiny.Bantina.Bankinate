@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SevenTiny.Bantina.Bankinate.MongoDb\SevenTiny.Bantina.Bankinate.MongoDb.csproj" />
+    <ProjectReference Include="..\Test.Common\Test.Common.csproj" />
   </ItemGroup>
 
 </Project>

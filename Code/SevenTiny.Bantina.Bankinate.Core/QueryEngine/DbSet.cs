@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace SevenTiny.Bantina.Bankinate
 {
@@ -15,9 +16,8 @@ namespace SevenTiny.Bantina.Bankinate
         /// <param name="dbContext">数据库操作上下文</param>
         internal static void PropertyInitialization(DbContext dbContext)
         {
-            foreach (var item in dbContext.GetType().GetProperties(BindingFlags.Public))
+            foreach (var item in dbContext.GetType().GetProperties())
             {
-                //这里最好用fullname，调试时候获取到修改下
                 if (item.PropertyType.Name.Equals("DbSet`1"))
                     item.SetValue(dbContext, Activator.CreateInstance(item.PropertyType, new[] { dbContext }));
             }
@@ -30,7 +30,7 @@ namespace SevenTiny.Bantina.Bankinate
     /// <typeparam name="TEntity"></typeparam>
     public class DbSet<TEntity> : ILinqQueryable<TEntity> where TEntity : class
     {
-        internal DbSet(DbContext dbContext)
+        public DbSet(DbContext dbContext)
         {
             DbContext = dbContext;
         }
@@ -46,65 +46,29 @@ namespace SevenTiny.Bantina.Bankinate
         /// </summary>
         private ILinqQueryable<TEntity> Queryable => QueryEngineSelector.Select<TEntity>(DbContext.DataBaseType, DbContext);
 
-        public bool Any()
-        {
-            return Queryable.Any();
-        }
+        public bool Any() => Queryable.Any();
 
-        public long Count()
-        {
-            return Queryable.Count();
-        }
+        public long Count() => Queryable.Count();
 
-        public TEntity FirstOrDefault()
-        {
-            return Queryable.FirstOrDefault();
-        }
+        public TEntity FirstOrDefault() => Queryable.FirstOrDefault();
 
-        public ILinqQueryable<TEntity> Limit(int count)
-        {
-            return Queryable.Limit(count);
-        }
+        public ILinqQueryable<TEntity> Limit(int count) => Queryable.Limit(count);
 
-        public ILinqQueryable<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy)
-        {
-            return Queryable.OrderBy(orderBy);
-        }
+        public ILinqQueryable<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy) => Queryable.OrderBy(orderBy);
 
-        public ILinqQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy)
-        {
-            return Queryable.OrderByDescending(orderBy);
-        }
+        public ILinqQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy) => Queryable.OrderByDescending(orderBy);
 
-        public ILinqQueryable<TEntity> Paging(int pageIndex, int pageSize)
-        {
-            return Queryable.Paging(pageIndex, pageSize);
-        }
+        public ILinqQueryable<TEntity> Paging(int pageIndex, int pageSize) => Queryable.Paging(pageIndex, pageSize);
 
-        public ILinqQueryable<TEntity> Select(Expression<Func<TEntity, object>> columns)
-        {
-            return Queryable.Select(columns);
-        }
+        public ILinqQueryable<TEntity> Select(Expression<Func<TEntity, object>> columns) => Queryable.Select(columns);
 
-        public object ToData()
-        {
-            return Queryable.ToData();
-        }
+        public object ToData() => Queryable.ToData();
 
-        public DataSet ToDataSet()
-        {
-            return Queryable.ToDataSet();
-        }
+        public DataSet ToDataSet() => Queryable.ToDataSet();
 
-        public List<TEntity> ToList()
-        {
-            return Queryable.ToList();
-        }
+        public List<TEntity> ToList() => Queryable.ToList();
 
-        public ILinqQueryable<TEntity> Where(Expression<Func<TEntity, bool>> filter)
-        {
-            return Queryable.Where(filter);
-        }
+        public ILinqQueryable<TEntity> Where(Expression<Func<TEntity, bool>> filter) => Queryable.Where(filter);
         #endregion
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-
-//需要扩展的类型需要在此添加对应的程序集友元标识
-[assembly: InternalsVisibleTo("SevenTiny.Bantina.Bankinate.MongoDb")]
-namespace SevenTiny.Bantina.Bankinate.DbContexts
+﻿namespace SevenTiny.Bantina.Bankinate.DbContexts
 {
     public abstract class NoSqlDbContext : DbContext
     {

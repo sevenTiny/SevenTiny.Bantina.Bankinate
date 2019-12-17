@@ -17,8 +17,6 @@ using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SevenTiny.Bantina.Bankinate.Attributes;
 using SevenTiny.Bantina.Bankinate.DbContexts;
-using SevenTiny.Bantina.Bankinate.Helpers;
-using SevenTiny.Bantina.Bankinate.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +41,8 @@ namespace SevenTiny.Bantina.Bankinate
         {
             SetContext();
 
-            Ensure.IsNotNullOrEmpty(host_port_dic, nameof(host_port_dic));
+            if (host_port_dic == null || !host_port_dic.Any())
+                throw new ArgumentException("host_port_dic must be provide.", nameof(host_port_dic));
 
             Client = new MongoClient(new MongoClientSettings
             {
@@ -87,67 +86,63 @@ namespace SevenTiny.Bantina.Bankinate
         #region 强类型 API
         public override void Add<TEntity>(TEntity entity)
         {
-            PropertyDataValidator.Verify(this, entity);
+            DataValidatorSafeExecute(v => v.Verify(entity));
             GetCollectionEntity<TEntity>().InsertOne(entity);
-            DbCacheManager.Add(entity);
+            this.DbCacheManagerSafeExecute(m => m.Add(entity));
         }
         public override async Task AddAsync<TEntity>(TEntity entity)
         {
-            PropertyDataValidator.Verify(this, entity);
+            DataValidatorSafeExecute(v => v.Verify(entity));
             await GetCollectionEntity<TEntity>().InsertOneAsync(entity);
-            DbCacheManager.Add(entity);
+            this.DbCacheManagerSafeExecute(m => m.Add(entity));
         }
         public void Add<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
-            PropertyDataValidator.Verify(this, entities);
+            DataValidatorSafeExecute(v => v.Verify(entities));
             GetCollectionEntity<TEntity>().InsertMany(entities);
-            DbCacheManager.Add(entities);
+            this.DbCacheManagerSafeExecute(m => m.Add(entities));
         }
         public async Task AddAsync<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
-            PropertyDataValidator.Verify(this, entities);
+            DataValidatorSafeExecute(v => v.Verify(entities));
             await GetCollectionEntity<TEntity>().InsertManyAsync(entities);
-            DbCacheManager.Add(entities);
+            this.DbCacheManagerSafeExecute(m => m.Add(entities));
         }
 
         public override void Update<TEntity>(Expression<Func<TEntity, bool>> filter, TEntity entity)
         {
-            PropertyDataValidator.Verify(this, entity);
+            DataValidatorSafeExecute(v => v.Verify(entity));
             GetCollectionEntity<TEntity>().ReplaceOne(filter, entity);
-            DbCacheManager.Update(entity, filter);
+            this.DbCacheManagerSafeExecute(m => m.Update(entity, filter));
         }
         public override async Task UpdateAsync<TEntity>(Expression<Func<TEntity, bool>> filter, TEntity entity)
         {
-            PropertyDataValidator.Verify(this, entity);
+            DataValidatorSafeExecute(v => v.Verify(entity));
             await GetCollectionEntity<TEntity>().ReplaceOneAsync(filter, entity);
-            DbCacheManager.Update(entity, filter);
+            this.DbCacheManagerSafeExecute(m => m.Update(entity, filter));
         }
 
         public void DeleteOne<TEntity>(Expression<Func<TEntity, bool>> filter) where TEntity : class
         {
             GetCollectionEntity<TEntity>().DeleteOne(filter);
-            DbCacheManager.Delete(filter);
+            this.DbCacheManagerSafeExecute(m => m.Delete(filter));
         }
         public async Task DeleteOneAsync<TEntity>(Expression<Func<TEntity, bool>> filter) where TEntity : class
         {
             await GetCollectionEntity<TEntity>().DeleteOneAsync(filter);
-            DbCacheManager.Delete(filter);
+            this.DbCacheManagerSafeExecute(m => m.Delete(filter));
         }
         public override void Delete<TEntity>(Expression<Func<TEntity, bool>> filter)
         {
             GetCollectionEntity<TEntity>().DeleteMany(filter);
-            DbCacheManager.Delete(filter);
+            this.DbCacheManagerSafeExecute(m => m.Delete(filter));
         }
         public override async Task DeleteAsync<TEntity>(Expression<Func<TEntity, bool>> filter)
         {
             await GetCollectionEntity<TEntity>().DeleteManyAsync(filter);
-            DbCacheManager.Delete(filter);
+            this.DbCacheManagerSafeExecute(m => m.Delete(filter));
         }
 
-        public MongoQueryable<TEntity> Queryable<TEntity>() where TEntity : class
-        {
-            return new MongoQueryable<TEntity>(this, DataBase);
-        }
         public IMongoQueryable<TEntity> MongoQueryable<TEntity>() where TEntity : class
         {
             return GetCollectionEntity<TEntity>().AsQueryable();

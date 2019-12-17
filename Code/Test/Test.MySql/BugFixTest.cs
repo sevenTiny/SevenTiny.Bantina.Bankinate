@@ -13,7 +13,7 @@ namespace Test.MySql
         [DataBase("SevenTinyTest")]
         private class BugDb : MySqlDbContext<BugDb>
         {
-            public BugDb() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
+            public BugDb() : base(ConnectionStringHelper.ConnectionString_Write_MySql, ConnectionStringHelper.ConnectionStrings_Read_MySql)
             {
                 //不真实持久化
                 RealExecutionSaveToDb = false;

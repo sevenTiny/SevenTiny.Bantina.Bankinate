@@ -25,7 +25,7 @@ namespace Test.Caching
         [DataBase("SevenTinyTest")]
         private class LocalTableCache : MySqlDbContext<LocalTableCache>
         {
-            public LocalTableCache() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
+            public LocalTableCache() : base(ConnectionStringHelper.ConnectionString_Write_MySql, ConnectionStringHelper.ConnectionStrings_Read_MySql)
             {
                 this.OpenLocalCache(openTableCache: true, tableCacheExpiredTimeSpan: TimeSpan.FromMilliseconds(_CacheMillisecondsTimeout));
                 RealExecutionSaveToDb = false;

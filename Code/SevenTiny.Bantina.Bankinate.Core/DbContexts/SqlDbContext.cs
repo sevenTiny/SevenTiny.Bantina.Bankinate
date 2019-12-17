@@ -1,20 +1,16 @@
 ﻿using SevenTiny.Bantina.Bankinate.Attributes;
 using SevenTiny.Bantina.Bankinate.Configs;
-using SevenTiny.Bantina.Bankinate.SqlDataAccess;
 using SevenTiny.Bantina.Bankinate.Helpers;
+using SevenTiny.Bantina.Bankinate.SqlDataAccess;
 using SevenTiny.Bantina.Bankinate.SqlStatementManagement;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using System.Linq;
 
-//需要扩展的类型需要在此添加对应的程序集友元标识
-[assembly: InternalsVisibleTo("SevenTiny.Bantina.Bankinate.MySql")]
-[assembly: InternalsVisibleTo("SevenTiny.Bantina.Bankinate.SqlServer")]
 namespace SevenTiny.Bantina.Bankinate.DbContexts
 {
     public abstract class SqlDbContext : DbContext, IExecuteSql, ICacheable

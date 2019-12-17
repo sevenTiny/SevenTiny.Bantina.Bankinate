@@ -17,7 +17,7 @@ namespace Test.Validation
         [DataBase("SevenTinyTest")]
         private class PropertyValidateDb : MySqlDbContext<PropertyValidateDb>
         {
-            public PropertyValidateDb() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
+            public PropertyValidateDb() : base(ConnectionStringHelper.ConnectionString_Write_MySql, ConnectionStringHelper.ConnectionStrings_Read_SqlServer)
             {
                 this.OpenDataValidation();
                 RealExecutionSaveToDb = false;

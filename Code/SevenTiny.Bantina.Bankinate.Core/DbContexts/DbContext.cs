@@ -1,13 +1,9 @@
-﻿using SevenTiny.Bantina.Bankinate.Configs;
-using SevenTiny.Bantina.Bankinate.ConnectionManagement;
+﻿using SevenTiny.Bantina.Bankinate.ConnectionManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-[assembly: InternalsVisibleTo("SevenTiny.Bantina.Bankinate.Caching")]
-[assembly: InternalsVisibleTo("SevenTiny.Bantina.Bankinate.Validation")]
 namespace SevenTiny.Bantina.Bankinate.DbContexts
 {
     /// <summary>

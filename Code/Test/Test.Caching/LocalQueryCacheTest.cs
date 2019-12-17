@@ -20,7 +20,7 @@ namespace Test.Caching
         [DataBase("SevenTinyTest")]
         private class LocalQueryCache : MySqlDbContext<LocalQueryCache>
         {
-            public LocalQueryCache() : base(ConnectionStringHelper.ConnectionString_Write, ConnectionStringHelper.ConnectionStrings_Read)
+            public LocalQueryCache() : base(ConnectionStringHelper.ConnectionString_Write_MySql, ConnectionStringHelper.ConnectionStrings_Read_MySql)
             {
                 this.OpenLocalCache(openQueryCache: true, queryCacheExpiredTimeSpan: TimeSpan.FromSeconds(_CacheSecends));
                 RealExecutionSaveToDb = false;
