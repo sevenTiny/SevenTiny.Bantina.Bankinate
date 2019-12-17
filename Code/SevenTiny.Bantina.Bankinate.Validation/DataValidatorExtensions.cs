@@ -27,7 +27,7 @@ namespace SevenTiny.Bantina.Bankinate.Validation
         /// <param name="dbContext"></param>
         public static void OpenDataValidation(this DbContext dbContext)
         {
-            dbContext.DataValidatorInitialize(new DataValidator());
+            dbContext.OpenDataValidation(new DataValidator());
         }
     }
 }

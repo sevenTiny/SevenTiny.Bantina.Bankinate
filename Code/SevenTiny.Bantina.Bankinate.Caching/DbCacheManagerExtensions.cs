@@ -33,7 +33,7 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// <param name="tableCacheExpiredTimeSpan">二级缓存过期时间</param>
         public static void OpenLocalCache(this DbContext dbContext, bool openQueryCache = false, bool openTableCache = false, TimeSpan queryCacheExpiredTimeSpan = default(TimeSpan), TimeSpan tableCacheExpiredTimeSpan = default(TimeSpan))
         {
-            dbContext.DbCacheManagerInitialize(new DbCacheManager(dbContext,
+            dbContext.OpenCache(new DbCacheManager(dbContext,
                 new CacheOptions()
                 {
                     OpenQueryCache = openQueryCache,
@@ -54,7 +54,7 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         {
             Ensure.ArgumentNotNullOrEmpty(cacheServer, nameof(cacheServer));
 
-            dbContext.DbCacheManagerInitialize(new DbCacheManager(dbContext,
+            dbContext.OpenCache(new DbCacheManager(dbContext,
                 new CacheOptions()
                 {
                     OpenQueryCache = openQueryCache,

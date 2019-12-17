@@ -50,12 +50,12 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// <summary>
         /// 缓存管理器，构造函数赋值，使用提供的执行器访问
         /// </summary>
-        protected IDbCacheManager DbCacheManager { private get; set; }
+        private IDbCacheManager DbCacheManager { get; set; }
         /// <summary>
         /// 缓存管理器初始化，用于在扩展组件中提供快捷初始化方法
         /// </summary>
         /// <param name="dbCacheManager"></param>
-        internal void DbCacheManagerInitialize(IDbCacheManager dbCacheManager)
+        protected internal void OpenCache(IDbCacheManager dbCacheManager)
         {
             if (DbCacheManager != null)
                 throw new InvalidOperationException("DbCacheManager has been Initialized.");
@@ -128,12 +128,12 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// <summary>
         /// 属性值校验器，构造函数赋值，使用提供的执行器访问
         /// </summary>
-        protected IDataValidator DataValidator { private get; set; }
+        private IDataValidator DataValidator { get; set; }
         /// <summary>
         /// 校验属性值校验器初始化，用于在扩展组件中提供快捷初始化方法
         /// </summary>
         /// <param name="dbCacheManager"></param>
-        internal void DataValidatorInitialize(IDataValidator dataValidator)
+        protected internal void OpenDataValidation(IDataValidator dataValidator)
         {
             if (DataValidator != null)
                 throw new InvalidOperationException("DataValidator has been Initialized.");
@@ -145,7 +145,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// 校验执行器
         /// </summary>
         /// <param name="action"></param>
-        protected void DataValidatorSafeExecute(Action<IDataValidator> action)
+        internal void DataValidatorSafeExecute(Action<IDataValidator> action)
         {
             if (DataValidator != null)
                 action(DataValidator);
