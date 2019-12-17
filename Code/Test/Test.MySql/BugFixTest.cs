@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Test.MySql
 {
-    public class BugTest
+    public class BugFixTest
     {
         [DataBase("SevenTinyTest")]
         private class BugDb : MySqlDbContext<BugDb>
