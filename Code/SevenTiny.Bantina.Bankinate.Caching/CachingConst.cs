@@ -34,7 +34,7 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// <summary>
         /// TableCache扫描键最多存在时间
         /// </summary>
-        internal static readonly TimeSpan SpanScaningKeyExpiredTime = TimeSpan.FromMinutes(20);
+        internal static readonly TimeSpan SpanScaningKeyExpiredTime = TimeSpan.FromMinutes(30);
         /// <summary>
         /// Table缓存键缓存的key前缀(用于保存所有的TableCache keys)
         /// </summary>

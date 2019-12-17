@@ -40,7 +40,7 @@ namespace SevenTiny.Bantina.Bankinate.Caching
 
         private string GetTableCacheKey(string collectionName = null)
         {
-            string key = $"{CachingConst.CacheKey_TableCache}{collectionName ?? DbContext.CollectionName}";
+            string key = $"{CachingConst.CacheKey_TableCache}_{DbContext.DataBaseName}_{collectionName ?? DbContext.CollectionName}";
 
             //缓存键更新
             if (!CacheStorageManager.IsExist(CachingConst.GetTableCacheKeysCacheKey(DbContext.DataBaseName), out HashSet<string> keys))
@@ -214,16 +214,17 @@ namespace SevenTiny.Bantina.Bankinate.Caching
             if (CacheStorageManager.IsExist(scanKey))
                 return;
 
+            //设置扫描键，标识当前正在进行扫描
+            CacheStorageManager.Put(scanKey, 1, CachingConst.SpanScaningKeyExpiredTime);
+
             //2.如果没有扫描键，则执行后台扫描任务
             Task.Factory.StartNew(() =>
             {
-                //设置扫描键，标识当前正在进行扫描
-                CacheStorageManager.Put(scanKey, 1, CachingConst.SpanScaningKeyExpiredTime);
                 //对扫描任务加锁，防止多线程环境多次执行任务
                 lock (tableScaningLocker)
                 {
                     var tableName = TableAttribute.GetName(typeof(TEntity));
-                    //双重校验当前缓存是否存在TableCache，防止多个进程在锁外等待，所释放后再次执行
+                    //双重校验当前缓存是否存在TableCache，防止重复获取
                     if (CacheStorageManager.IsExist(GetTableCacheKey(tableName)))
                         return;
 
