@@ -107,7 +107,6 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// 查询执行器
         /// </summary>
         internal QueryExecutor QueryExecutor { get; private set; }
-
         /// <summary>
         /// 根据实体获取表名
         /// </summary>
@@ -115,7 +114,6 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         /// <returns></returns>
         public string GetTableName<TEntity>() where TEntity : class
             => TableAttribute.GetName(typeof(TEntity));
-
         /// <summary>
         /// 获取一级缓存的缓存键
         /// </summary>
@@ -128,6 +126,23 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
                 return MD5Helper.GetMd5Hash($"{SqlStatement}_{string.Join("|", Parameters.Values)}");
             }
             return MD5Helper.GetMd5Hash(SqlStatement);
+        }
+        /// <summary>
+        /// 切换数据库连接
+        /// </summary>
+        /// <param name="operationType"></param>
+        private void SwitchConnection(OperationType operationType)
+        {
+            //获取下次执行的链接字符串
+            var connectionString = this.ConnectionManager.SetConnectionString(operationType);
+            //如果下次设置的链接字符串和当前的一致，则无需切换
+            if (connectionString.Equals(this.DbConnection.ConnectionString))
+                return;
+
+            if (this.DbConnection.State != ConnectionState.Closed)
+                this.DbConnection.Close();
+
+            this.DbConnection.ConnectionString = connectionString;
         }
         #endregion
 
@@ -172,14 +187,14 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.DbCommand.Transaction.Rollback();
         }
         #endregion
-
+        
         #region 强类型的执行操作API
         public override void Add<TEntity>(TEntity entity)
         {
             DataValidatorSafeExecute(v => v.Verify(entity));
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Add(entity);
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             this.QueryExecutor.ExecuteNonQuery();
             this.DbCacheManagerSafeExecute(m => m.Add(entity));
         }
@@ -188,13 +203,13 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DataValidatorSafeExecute(v => v.Verify(entity));
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Add(entity);
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();
             this.DbCacheManagerSafeExecute(m => m.Add(entity));
         }
         public void Add<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             DbCommand.CommandType = CommandType.Text;
             foreach (var entity in entities)
             {
@@ -206,7 +221,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         }
         public async Task AddAsync<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
         {
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             DbCommand.CommandType = CommandType.Text;
             foreach (var entity in entities)
             {
@@ -221,7 +236,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         {
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Delete(entity);
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             QueryExecutor.ExecuteNonQuery();
             this.DbCacheManagerSafeExecute(m => m.Delete(entity));
         }
@@ -229,7 +244,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         {
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Delete(entity);
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();
             this.DbCacheManagerSafeExecute(m => m.Delete(entity));
         }
@@ -237,7 +252,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         {
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Delete(filter);
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             this.QueryExecutor.ExecuteNonQuery();
             this.DbCacheManagerSafeExecute(m => m.Delete(filter));
         }
@@ -245,7 +260,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         {
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Delete(filter);
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();
             this.DbCacheManagerSafeExecute(m => m.Delete(filter));
         }
@@ -255,7 +270,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DataValidatorSafeExecute(v => v.Verify(entity));
             DbCommand.CommandType = CommandType.Text;
             this.CommandTextGenerator.Update(entity, out Expression<Func<TEntity, bool>> filter);
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             QueryExecutor.ExecuteNonQuery();
             this.DbCacheManagerSafeExecute(m => m.Update(entity, filter));
         }
@@ -264,7 +279,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             DataValidatorSafeExecute(v => v.Verify(entity));
             this.CommandTextGenerator.Update(entity, out Expression<Func<TEntity, bool>> filter);
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();
             this.DbCacheManagerSafeExecute(m => m.Update(entity, filter));
         }
@@ -273,7 +288,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             DataValidatorSafeExecute(v => v.Verify(entity));
             this.CommandTextGenerator.Update(filter, entity);
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             QueryExecutor.ExecuteNonQuery();
             this.DbCacheManagerSafeExecute(m => m.Update(entity, filter));
         }
@@ -282,7 +297,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             DataValidatorSafeExecute(v => v.Verify(entity));
             this.CommandTextGenerator.Update(filter, entity);
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             await QueryExecutor.ExecuteNonQueryAsync();
             this.DbCacheManagerSafeExecute(m => m.Update(entity, filter));
         }
@@ -294,7 +309,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             this.SqlStatement = sqlStatement;
             this.Parameters = parms;
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             return QueryExecutor.ExecuteNonQuery();
         }
         public async Task<int> ExecuteSqlAsync(string sqlStatement, IDictionary<string, object> parms = null)
@@ -302,7 +317,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             DbCommand.CommandType = CommandType.Text;
             this.SqlStatement = sqlStatement;
             this.Parameters = parms;
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             return await QueryExecutor.ExecuteNonQueryAsync();
         }
         public int ExecuteStoredProcedure(string storedProcedureName, IDictionary<string, object> parms = null)
@@ -310,7 +325,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.SqlStatement = storedProcedureName;
             this.Parameters = parms;
             DbCommand.CommandType = CommandType.StoredProcedure;
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             return QueryExecutor.ExecuteNonQuery();
         }
         public async Task<int> ExecuteStoredProcedureAsync(string storedProcedureName, IDictionary<string, object> parms = null)
@@ -318,7 +333,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.SqlStatement = storedProcedureName;
             this.Parameters = parms;
             DbCommand.CommandType = CommandType.StoredProcedure;
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Write);
+            this.SwitchConnection(OperationType.Write);
             return await QueryExecutor.ExecuteNonQueryAsync();
         }
         #endregion
@@ -334,7 +349,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.DbCommand.CommandType = CommandType.Text;
             //重置命令生成器，防止上次查询参数被重用
             this.CreateCommandTextGenerator();
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Read);
+            this.SwitchConnection(OperationType.Read);
             return new SqlQueryable<TEntity>(this);
         }
         /// <summary>
@@ -346,7 +361,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.DbCommand.CommandType = CommandType.Text;
             this.SqlStatement = sqlStatement;
             this.Parameters = parms;
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Read);
+            this.SwitchConnection(OperationType.Read);
             return new SqlQueryable<TEntity>(this);
         }
         /// <summary>
@@ -358,7 +373,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.DbCommand.CommandType = CommandType.StoredProcedure;
             this.SqlStatement = storedProcedureName;
             this.Parameters = parms;
-            this.DbConnection.ConnectionString = this.ConnectionManager.SetConnectionString(OperationType.Read);
+            this.SwitchConnection(OperationType.Read);
             return new SqlQueryable<TEntity>(this);
         }
         #endregion
