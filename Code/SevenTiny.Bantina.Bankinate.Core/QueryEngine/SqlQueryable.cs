@@ -14,6 +14,7 @@
 *********************************************************/
 using SevenTiny.Bantina.Bankinate.DbContexts;
 using SevenTiny.Bantina.Bankinate.Extensions;
+using SevenTiny.Bantina.Bankinate.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -29,30 +30,36 @@ namespace SevenTiny.Bantina.Bankinate
     {
         private string Alias => _where.Parameters[0].Name;
 
-        internal SqlQueryable(SqlDbContext _dbContext) : base(_dbContext)
+        internal SqlQueryable(SqlDbContext dbContext) : base(dbContext)
         {
         }
 
         public ILinqQueryable<TEntity> Where(Expression<Func<TEntity, bool>> filter)
         {
-            if (_where != null)
-                _where = _where.And(filter);
-            else
-                _where = filter;
+            Ensure.ArgumentNotNullOrEmpty(filter, nameof(filter));
+
+            _where = _where.And(filter);
+
             return this;
         }
 
         public ILinqQueryable<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy)
         {
+            Ensure.ArgumentNotNullOrEmpty(orderBy, nameof(orderBy));
+
             _orderby = orderBy;
             _isDesc = false;
+
             return this;
         }
 
         public ILinqQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy)
         {
+            Ensure.ArgumentNotNullOrEmpty(orderBy, nameof(orderBy));
+
             _orderby = orderBy;
             _isDesc = true;
+
             return this;
         }
 
@@ -89,51 +96,57 @@ namespace SevenTiny.Bantina.Bankinate
         /// <returns></returns>
         public ILinqQueryable<TEntity> Limit(int count)
         {
-            DbContext.CommandTextGenerator.SetLimit(count);
+            _dbContext.CommandTextGenerator.SetLimit(count);
             return this;
         }
 
         public List<TEntity> ToList()
         {
+            if (_dbContext.IsSqlStatementOrStoredProcedure)
+                return _dbContext.QueryExecutor.ExecuteList<TEntity>();
+
             MustExistCheck();
             ReSetTableName();
 
-            DbContext.CommandTextGenerator.SetAlias(Alias);
-            DbContext.CommandTextGenerator.SetColumns(_columns);
-            DbContext.CommandTextGenerator.SetWhere(_where);
-            DbContext.CommandTextGenerator.SetOrderBy(_orderby, _isDesc);
+            _dbContext.CommandTextGenerator.SetAlias(Alias);
+            _dbContext.CommandTextGenerator.SetColumns(_columns);
+            _dbContext.CommandTextGenerator.SetWhere(_where);
+            _dbContext.CommandTextGenerator.SetOrderBy(_orderby, _isDesc);
 
             if (_isPaging)
             {
-                DbContext.CommandTextGenerator.SetPage(_pageIndex, _pageSize);
-                DbContext.CommandTextGenerator.QueryablePaging<TEntity>();
+                _dbContext.CommandTextGenerator.SetPage(_pageIndex, _pageSize);
+                _dbContext.CommandTextGenerator.QueryablePaging<TEntity>();
             }
             else
             {
-                DbContext.CommandTextGenerator.QueryableQuery<TEntity>();
+                _dbContext.CommandTextGenerator.QueryableQuery<TEntity>();
             }
 
-            return DbContext.DbCacheManagerSafeExecute((m, r) => m.GetEntities(_where, r), () =>
+            return _dbContext.DbCacheManagerSafeExecute((m, r) => m.GetEntities(_where, r), () =>
             {
-                return DbContext.QueryExecutor.ExecuteList<TEntity>();
+                return _dbContext.QueryExecutor.ExecuteList<TEntity>();
             });
         }
 
         public TEntity FirstOrDefault()
         {
+            if (_dbContext.IsSqlStatementOrStoredProcedure)
+                return _dbContext.QueryExecutor.ExecuteEntity<TEntity>();
+
             MustExistCheck();
             ReSetTableName();
 
-            DbContext.CommandTextGenerator.SetAlias(Alias);
-            DbContext.CommandTextGenerator.SetColumns(_columns);
-            DbContext.CommandTextGenerator.SetWhere(_where);
-            DbContext.CommandTextGenerator.SetOrderBy(_orderby, _isDesc);
+            _dbContext.CommandTextGenerator.SetAlias(Alias);
+            _dbContext.CommandTextGenerator.SetColumns(_columns);
+            _dbContext.CommandTextGenerator.SetWhere(_where);
+            _dbContext.CommandTextGenerator.SetOrderBy(_orderby, _isDesc);
             Limit(1);
-            DbContext.CommandTextGenerator.QueryableQuery<TEntity>();
+            _dbContext.CommandTextGenerator.QueryableQuery<TEntity>();
 
-            return DbContext.DbCacheManagerSafeExecute((m, r) => m.GetEntity(_where, r), () =>
+            return _dbContext.DbCacheManagerSafeExecute((m, r) => m.GetEntity(_where, r), () =>
             {
-                return DbContext.QueryExecutor.ExecuteEntity<TEntity>();
+                return _dbContext.QueryExecutor.ExecuteEntity<TEntity>();
             });
         }
 
@@ -142,13 +155,13 @@ namespace SevenTiny.Bantina.Bankinate
             MustExistCheck();
             ReSetTableName();
 
-            DbContext.CommandTextGenerator.SetAlias(Alias);
-            DbContext.CommandTextGenerator.SetWhere(_where);
-            DbContext.CommandTextGenerator.QueryableCount<TEntity>();
+            _dbContext.CommandTextGenerator.SetAlias(Alias);
+            _dbContext.CommandTextGenerator.SetWhere(_where);
+            _dbContext.CommandTextGenerator.QueryableCount<TEntity>();
 
-            return DbContext.DbCacheManagerSafeExecute((m, r) => m.GetCount(_where, r), () =>
+            return _dbContext.DbCacheManagerSafeExecute((m, r) => m.GetCount(_where, r), () =>
             {
-                return Convert.ToInt64(DbContext.QueryExecutor.ExecuteScalar());
+                return Convert.ToInt64(_dbContext.QueryExecutor.ExecuteScalar());
             });
         }
 
@@ -157,52 +170,58 @@ namespace SevenTiny.Bantina.Bankinate
             MustExistCheck();
             ReSetTableName();
 
-            DbContext.CommandTextGenerator.SetAlias(Alias);
-            DbContext.CommandTextGenerator.SetWhere(_where);
-            DbContext.CommandTextGenerator.QueryableAny<TEntity>(); //内部 Limit(1)
+            _dbContext.CommandTextGenerator.SetAlias(Alias);
+            _dbContext.CommandTextGenerator.SetWhere(_where);
+            _dbContext.CommandTextGenerator.QueryableAny<TEntity>(); //内部 Limit(1)
 
-            return DbContext.DbCacheManagerSafeExecute((m, r) => m.GetCount(_where, r), () =>
+            return _dbContext.DbCacheManagerSafeExecute((m, r) => m.GetCount(_where, r), () =>
             {
-                return Convert.ToInt64(DbContext.QueryExecutor.ExecuteScalar());
+                return Convert.ToInt64(_dbContext.QueryExecutor.ExecuteScalar());
             }) > 0;
         }
 
         public object ToData()
         {
+            if (_dbContext.IsSqlStatementOrStoredProcedure)
+                return _dbContext.QueryExecutor.ExecuteScalar();
+
             MustExistCheck();
             ReSetTableName();
 
-            DbContext.CommandTextGenerator.SetAlias(Alias);
-            DbContext.CommandTextGenerator.SetColumns(_columns);
-            DbContext.CommandTextGenerator.SetWhere(_where);
-            DbContext.CommandTextGenerator.SetOrderBy(_orderby, _isDesc);
+            _dbContext.CommandTextGenerator.SetAlias(Alias);
+            _dbContext.CommandTextGenerator.SetColumns(_columns);
+            _dbContext.CommandTextGenerator.SetWhere(_where);
+            _dbContext.CommandTextGenerator.SetOrderBy(_orderby, _isDesc);
             Limit(1);
-            DbContext.CommandTextGenerator.QueryableQuery<TEntity>();
+            _dbContext.CommandTextGenerator.QueryableQuery<TEntity>();
 
-            return DbContext.QueryExecutor.ExecuteScalar();
+            return _dbContext.QueryExecutor.ExecuteScalar();
         }
 
         public DataSet ToDataSet()
         {
+            if (_dbContext.IsSqlStatementOrStoredProcedure)
+                return _dbContext.QueryExecutor.ExecuteDataSet();
+
             MustExistCheck();
             ReSetTableName();
 
-            DbContext.CommandTextGenerator.SetAlias(Alias);
-            DbContext.CommandTextGenerator.SetColumns(_columns);
-            DbContext.CommandTextGenerator.SetWhere(_where);
-            DbContext.CommandTextGenerator.SetOrderBy(_orderby, _isDesc);
+            _dbContext.CommandTextGenerator.SetAlias(Alias);
+            _dbContext.CommandTextGenerator.SetColumns(_columns);
+            _dbContext.CommandTextGenerator.SetWhere(_where);
+            _dbContext.CommandTextGenerator.SetOrderBy(_orderby, _isDesc);
 
             if (_isPaging)
             {
-                DbContext.CommandTextGenerator.SetPage(_pageIndex, _pageSize);
-                DbContext.CommandTextGenerator.QueryablePaging<TEntity>();
+                _dbContext.CommandTextGenerator.SetPage(_pageIndex, _pageSize);
+                _dbContext.CommandTextGenerator.QueryablePaging<TEntity>();
             }
             else
             {
-                DbContext.CommandTextGenerator.QueryableQuery<TEntity>();
+                _dbContext.CommandTextGenerator.QueryableQuery<TEntity>();
             }
 
-            return DbContext.QueryExecutor.ExecuteDataSet();
+            return _dbContext.QueryExecutor.ExecuteDataSet();
         }
     }
 }

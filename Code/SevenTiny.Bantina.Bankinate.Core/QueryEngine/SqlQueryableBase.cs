@@ -26,18 +26,18 @@ namespace SevenTiny.Bantina.Bankinate
     /// <typeparam name="TEntity"></typeparam>
     internal abstract class SqlQueryableBase<TEntity> where TEntity : class
     {
-        public SqlQueryableBase(SqlDbContext _dbContext)
+        public SqlQueryableBase(SqlDbContext dbContext)
         {
-            DbContext = _dbContext;
+            _dbContext = dbContext;
         }
 
         //context
-        protected SqlDbContext DbContext;
+        protected SqlDbContext _dbContext;
 
         //query info
-        public string SqlStatement => DbContext.DbCommand.CommandText;
-        public string TableName => DbContext.TableName;
-        public IDictionary<string, object> Parameters => DbContext.Parameters;
+        public string SqlStatement => _dbContext.DbCommand.CommandText;
+        public string TableName => _dbContext.TableName;
+        public IDictionary<string, object> Parameters => _dbContext.Parameters;
 
         //where
         protected Expression<Func<TEntity, bool>> _where = t => true;
@@ -72,7 +72,7 @@ namespace SevenTiny.Bantina.Bankinate
         /// </summary>
         protected void ReSetTableName()
         {
-            DbContext.TableName = TableAttribute.GetName(typeof(TEntity));
+            _dbContext.TableName = TableAttribute.GetName(typeof(TEntity));
         }
     }
 }

@@ -144,6 +144,10 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
 
             this.DbConnection.ConnectionString = connectionString;
         }
+        /// <summary>
+        /// 是否Sql语句或者存储过程,如果是SQL语句或者存储过程，则查询时不走缓存，且跳过LINQ解析的代码
+        /// </summary>
+        internal bool IsSqlStatementOrStoredProcedure { get; set; } = false;
         #endregion
 
         #region 事务控制
@@ -187,7 +191,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.DbCommand.Transaction.Rollback();
         }
         #endregion
-        
+
         #region 强类型的执行操作API
         public override void Add<TEntity>(TEntity entity)
         {
@@ -310,6 +314,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.SqlStatement = sqlStatement;
             this.Parameters = parms;
             this.SwitchConnection(OperationType.Write);
+            this.IsSqlStatementOrStoredProcedure = true;
             return QueryExecutor.ExecuteNonQuery();
         }
         public async Task<int> ExecuteSqlAsync(string sqlStatement, IDictionary<string, object> parms = null)
@@ -318,6 +323,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.SqlStatement = sqlStatement;
             this.Parameters = parms;
             this.SwitchConnection(OperationType.Write);
+            this.IsSqlStatementOrStoredProcedure = true;
             return await QueryExecutor.ExecuteNonQueryAsync();
         }
         public int ExecuteStoredProcedure(string storedProcedureName, IDictionary<string, object> parms = null)
@@ -326,6 +332,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.Parameters = parms;
             DbCommand.CommandType = CommandType.StoredProcedure;
             this.SwitchConnection(OperationType.Write);
+            this.IsSqlStatementOrStoredProcedure = true;
             return QueryExecutor.ExecuteNonQuery();
         }
         public async Task<int> ExecuteStoredProcedureAsync(string storedProcedureName, IDictionary<string, object> parms = null)
@@ -334,6 +341,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.Parameters = parms;
             DbCommand.CommandType = CommandType.StoredProcedure;
             this.SwitchConnection(OperationType.Write);
+            this.IsSqlStatementOrStoredProcedure = true;
             return await QueryExecutor.ExecuteNonQueryAsync();
         }
         #endregion
@@ -362,6 +370,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.SqlStatement = sqlStatement;
             this.Parameters = parms;
             this.SwitchConnection(OperationType.Read);
+            this.IsSqlStatementOrStoredProcedure = true;
             return new SqlQueryable<TEntity>(this);
         }
         /// <summary>
@@ -374,6 +383,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
             this.SqlStatement = storedProcedureName;
             this.Parameters = parms;
             this.SwitchConnection(OperationType.Read);
+            this.IsSqlStatementOrStoredProcedure = true;
             return new SqlQueryable<TEntity>(this);
         }
         #endregion

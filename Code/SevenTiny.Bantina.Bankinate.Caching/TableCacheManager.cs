@@ -1,5 +1,6 @@
 ﻿using SevenTiny.Bantina.Bankinate.Attributes;
 using SevenTiny.Bantina.Bankinate.DbContexts;
+using SevenTiny.Bantina.Bankinate.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,6 +105,8 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// <param name="filter"></param>
         internal void UpdateCache<TEntity>(TEntity entity, Expression<Func<TEntity, bool>> filter)
         {
+            Ensure.ArgumentNotNullOrEmpty(filter, nameof(filter));
+
             var tableName = TableAttribute.GetName(typeof(TEntity));
             //如果存在表级别缓存，则更新数据到缓存
             if (CacheStorageManager.IsExist(GetTableCacheKey(tableName), out List<TEntity> entities))
@@ -130,6 +133,8 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// <param name="filter"></param>
         internal void DeleteCache<TEntity>(Expression<Func<TEntity, bool>> filter)
         {
+            Ensure.ArgumentNotNullOrEmpty(filter, nameof(filter));
+
             var tableName = TableAttribute.GetName(typeof(TEntity));
             //如果存在表级别缓存，则更新数据到缓存
             if (CacheStorageManager.IsExist(GetTableCacheKey(tableName), out List<TEntity> entities))
@@ -183,6 +188,8 @@ namespace SevenTiny.Bantina.Bankinate.Caching
         /// <returns></returns>
         internal List<TEntity> GetEntitiesFromCache<TEntity>(Expression<Func<TEntity, bool>> filter) where TEntity : class
         {
+            Ensure.ArgumentNotNullOrEmpty(filter, nameof(filter));
+
             //1.如果TableCache里面有该缓存键，则直接获取
             if (CacheStorageManager.IsExist(GetTableCacheKey(TableAttribute.GetName(typeof(TEntity))), out List<TEntity> entities))
             {
