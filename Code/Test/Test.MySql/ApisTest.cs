@@ -275,5 +275,15 @@ namespace Test.MySql
                 Assert.Equal(new[] { "%3" }, db.Parameters.Values.ToArray());
             }
         }
+
+        [Fact]
+        public void Query_SQL_FirstOrDefault()
+        {
+            using (var db = new ApiDb())
+            {
+                db.Queryable<OperationTest>($"SELECT * FROM TTTTTest LIMIT 1").FirstOrDefault();
+                Assert.Equal("SELECT * FROM TTTTTest LIMIT 1", db.SqlStatement);
+            }
+        }
     }
 }
