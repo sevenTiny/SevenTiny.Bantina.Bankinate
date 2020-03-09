@@ -33,6 +33,7 @@ namespace Test.Common.Model
         /// </summary>
         //[Column]
         public float? FloatNullKey { get; set; }
+        public Guid GuidKey { get; set; }
     }
 }
 

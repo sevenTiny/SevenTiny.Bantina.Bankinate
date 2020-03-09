@@ -1,5 +1,6 @@
 ﻿using SevenTiny.Bantina.Bankinate;
 using SevenTiny.Bantina.Bankinate.Attributes;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using Test.Common;
@@ -30,6 +31,20 @@ namespace Test.MySql
                 Assert.Equal("SELECT * FROM OperateTest t  WHERE ( 1=1 )  AND  (((t.IntKey = @tIntKey)  AND  (t.Id <> @tId))  AND  ((t.StringKey LIKE @tStringKey)  Or  (t.StringKey LIKE @tStringKey0)))  LIMIT 1", db.SqlStatement);
                 Assert.Equal(new[] { "@tIntKey", "@tId", "@tStringKey", "@tStringKey0" }, db.Parameters.Keys.ToArray());
                 Assert.Equal(new[] { "1", "2", "%1%", "%2%" }, db.Parameters.Values.ToArray());
+            }
+        }
+
+        [Fact]
+        [Description("Guid类型字段参数化查询会带一个单引号的问题，Commit a09b5505")]
+        public void Query_GuidFieldParameters()
+        {
+            using (var db = new BugDb())
+            {
+                var uid = Guid.Parse("27616d9b-5579-48eb-8d84-8dbc4322ce96");
+                var re = db.Queryable<OperationTest>().Where(t =>t.GuidKey.Equals(uid)).ToList();
+                Assert.Equal("SELECT * FROM OperateTest t  WHERE ( 1=1 )  AND  (t.GuidKey = @tGuidKey)", db.SqlStatement);
+                Assert.Equal(new[] { "@tGuidKey" }, db.Parameters.Keys.ToArray());
+                Assert.Equal(new[] { "27616d9b-5579-48eb-8d84-8dbc4322ce96" }, db.Parameters.Values.ToArray());//原来的guid字符串里面会嵌套一层''，导致参数化查询bug
             }
         }
     }
