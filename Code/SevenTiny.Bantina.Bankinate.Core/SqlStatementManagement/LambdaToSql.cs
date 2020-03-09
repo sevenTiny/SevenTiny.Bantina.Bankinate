@@ -155,7 +155,8 @@ namespace SevenTiny.Bantina.Bankinate.SqlStatementManagement
                     {
                         if (result is Guid)
                         {
-                            return $"'{result}'";
+                            //Guid为啥要单独处理
+                            return $"{result}";
                         }
                         return result.ToString();
                     }
