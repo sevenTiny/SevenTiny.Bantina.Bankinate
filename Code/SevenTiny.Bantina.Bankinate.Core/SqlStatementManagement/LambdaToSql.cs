@@ -197,7 +197,7 @@ namespace SevenTiny.Bantina.Bankinate.SqlStatementManagement
 
                 if (mce.Method.Name.Equals("Equals"))
                 {
-                    parameters.AddOrUpdate(keyNameNoPoint, $"{value}");
+                    parameters.AddOrUpdate(keyNameNoPoint, $"{value.Replace("'", "")}");
                     return $"{keyName} = {keyNameNoPoint}";
                 }
                 else if (mce.Method.Name.Equals("Contains"))
