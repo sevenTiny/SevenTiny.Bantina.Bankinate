@@ -356,7 +356,7 @@ namespace SevenTiny.Bantina.Bankinate.DbContexts
         {
             this.DbCommand.CommandType = CommandType.Text;
             //重置命令生成器，防止上次查询参数被重用
-            this.CreateCommandTextGenerator();
+            this.CommandTextGenerator = this.CreateCommandTextGenerator();
             this.SwitchConnection(OperationType.Read);
             return new SqlQueryable<TEntity>(this);
         }

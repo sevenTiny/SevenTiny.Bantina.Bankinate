@@ -41,10 +41,26 @@ namespace Test.MySql
             using (var db = new BugDb())
             {
                 var uid = Guid.Parse("27616d9b-5579-48eb-8d84-8dbc4322ce96");
-                var re = db.Queryable<OperationTest>().Where(t =>t.GuidKey.Equals(uid)).ToList();
+                var re = db.Queryable<OperationTest>().Where(t => t.GuidKey.Equals(uid)).ToList();
                 Assert.Equal("SELECT * FROM OperateTest t  WHERE ( 1=1 )  AND  (t.GuidKey = @tGuidKey)", db.SqlStatement);
                 Assert.Equal(new[] { "@tGuidKey" }, db.Parameters.Keys.ToArray());
                 Assert.Equal(new[] { "27616d9b-5579-48eb-8d84-8dbc4322ce96" }, db.Parameters.Values.ToArray());//原来的guid字符串里面会嵌套一层''，导致参数化查询bug
+            }
+        }
+
+        [Fact]
+        [Description("重置命令生成器并没有进行赋值，导致命令被重复使用")]
+        public void QueryOneFirstThenQueryManyAttachLimit1()
+        {
+            using (var db = new BugDb())
+            {
+                var uid = Guid.Parse("27616d9b-5579-48eb-8d84-8dbc4322ce96");
+                var re = db.Queryable<OperationTest>().Where(t => t.GuidKey.Equals(uid)).FirstOrDefault();
+                var sql1 = db.SqlStatement;
+
+                var re2 = db.Queryable<OperationTest>().Where(t => t.GuidKey.Equals(uid)).ToList();
+                var sql2 = db.SqlStatement;
+                Assert.NotEqual(sql1, sql2);
             }
         }
     }
