@@ -157,6 +157,17 @@ namespace Test.MySql
         }
 
         [Fact]
+        public void Query_Equals()
+        {
+            using (var db = new ApiDb())
+            {
+                db.Queryable<OperationTest>().Where(t=>t.StringKey=="123").ToList();
+                Assert.Equal("SELECT * FROM OperateTest t  WHERE  1=1", db.SqlStatement);
+                Assert.Equal(new string[0], db.Parameters.Keys.ToArray());
+            }
+        }
+
+        [Fact]
         public void Query_Where()
         {
             using (var db = new ApiDb())
