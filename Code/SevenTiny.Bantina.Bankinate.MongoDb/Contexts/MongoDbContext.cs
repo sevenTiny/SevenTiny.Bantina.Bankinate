@@ -64,7 +64,7 @@ namespace SevenTiny.Bantina.Bankinate
         }
 
         #region MongoDb Server
-        protected MongoClient Client { get; set; }
+        protected MongoClient Client { get; private set; }
         protected IMongoDatabase DataBase => Client.GetDatabase(DataBaseName);
         public IMongoCollection<TEntity> GetCollectionEntity<TEntity>() where TEntity : class
         {
